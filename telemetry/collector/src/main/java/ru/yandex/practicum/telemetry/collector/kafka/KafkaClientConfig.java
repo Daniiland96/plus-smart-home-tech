@@ -2,8 +2,11 @@ package ru.yandex.practicum.telemetry.collector.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.*;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,34 +17,29 @@ import java.util.concurrent.Future;
 @Slf4j
 @Configuration
 public class KafkaClientConfig {
-    @Value("${collector.kafka.producer.properties.bootstrap-servers}")
-    private String bootstrapServers;
-    @Value("${collector.kafka.producer.properties.key-serializer}")
-    private String keySerializer;
-    @Value("${collector.kafka.producer.properties.value-serializer}")
-    private String valueSerializer;
 
     @Bean
-    Producer<String, SpecificRecordBase> getProducer() {
-        Properties configs = new Properties();
-        configs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
-        log.info("Create {}", Producer.class.getSimpleName());
-        return new KafkaProducer<>(configs);
+    @ConfigurationProperties(prefix = "collector.kafka.producer.properties")
+    public Properties kafkaProducerProperties() {
+        return new Properties();
     }
 
     @Bean
-    KafkaClient getKafkaClient() {
+    Producer<String, SpecificRecordBase> kafkaProducer(Properties kafkaProducerProperties) {
+        log.info("Create {}", Producer.class.getSimpleName());
+        return new KafkaProducer<>(kafkaProducerProperties);
+    }
+
+    @Bean
+    KafkaClient getKafkaClient(Producer<String, SpecificRecordBase> kafkaProducer) {
         return new KafkaClient() {
-            private final Producer<String, SpecificRecordBase> producer = getProducer();
 
             @Override
             public void send(String topic, Integer partition, Long timestamp, String hubId, SpecificRecordBase event) {
                 ProducerRecord<String, SpecificRecordBase> record =
                         new ProducerRecord<>(topic, partition, timestamp, hubId, event);
                 log.info("Send in topic {} the record: {}", topic, event);
-                Future<RecordMetadata> recordMetadataFuture = producer.send(record);
+                Future<RecordMetadata> recordMetadataFuture = kafkaProducer.send(record);
 
                 try {
                     log.info("Record successfully send. Record: {}", recordMetadataFuture.get());
@@ -54,9 +52,9 @@ public class KafkaClientConfig {
 
             @Override
             public void close() {
-                producer.flush();
+                kafkaProducer.flush();
                 log.info("Close {}", Producer.class.getSimpleName());
-                producer.close();
+                kafkaProducer.close();
             }
         };
     }

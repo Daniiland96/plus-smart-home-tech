@@ -18,7 +18,7 @@ protocol HubEventProtocol {
 		HUMIDITY
 	}
 
-	enum ConditionOperationAvro{
+	enum ConditionOperationAvro {
 		EQUALS,
 		GREATER_THAN,
 		LOWER_THAN
@@ -32,11 +32,11 @@ protocol HubEventProtocol {
 	}
 
 	record DeviceAddedEventAvro {
-		string  id;
+		string id;
 		DeviceTypeAvro type;
 	}
 
-	record DeviceRemovedEventAvro{
+	record DeviceRemovedEventAvro {
 		string id;
 	}
 
@@ -44,7 +44,7 @@ protocol HubEventProtocol {
 		string sensor_id;
 		ConditionTypeAvro type;
 		ConditionOperationAvro operation;
-		union {null, int, boolean} value = null;
+		union{null, int, boolean} value = null;
 	}
 
 	record DeviceActionAvro {
@@ -66,6 +66,6 @@ protocol HubEventProtocol {
 	record HubEventAvro {
 		string hub_id;
 		timestamp_ms timestamp;
-		union {DeviceAddedEventAvro, DeviceRemovedEventAvro, ScenarioAddedEventAvro, ScenarioRemovedEventAvro} payload;
+		union{DeviceAddedEventAvro, DeviceRemovedEventAvro, ScenarioAddedEventAvro, ScenarioRemovedEventAvro} payload;
 	}
 }

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
-import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 
 @Slf4j
 public abstract class BaseSensorEventMapper<T extends SpecificRecordBase> implements SensorEventMapper {

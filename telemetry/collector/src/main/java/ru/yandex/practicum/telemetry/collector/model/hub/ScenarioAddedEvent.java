@@ -1,24 +1,32 @@
 package ru.yandex.practicum.telemetry.collector.model.hub;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.yandex.practicum.telemetry.collector.model.hub.enums.DeviceType;
 import ru.yandex.practicum.telemetry.collector.model.hub.enums.HubEventType;
+
+import java.util.List;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class DeviceAddedEvent extends HubEvent {
+public class ScenarioAddedEvent extends HubEvent {
     @NotBlank
-    private String id;
+    @Size(min = 3)
+    private String name;
     @NotNull
-    private DeviceType deviceType;
+    @NotEmpty
+    private List<ScenarioCondition> conditions;
+    @NotNull
+    @NotEmpty
+    private List<DeviceAction> actions;
 
     @Override
     public HubEventType getType() {
-        return HubEventType.DEVICE_ADDED;
+        return HubEventType.SCENARIO_ADDED;
     }
 }

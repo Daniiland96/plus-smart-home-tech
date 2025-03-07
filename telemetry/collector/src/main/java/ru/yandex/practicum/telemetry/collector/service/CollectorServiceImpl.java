@@ -30,9 +30,11 @@ public class CollectorServiceImpl implements CollectorService {
     private final Map<SensorEventType, SensorEventMapper> sensorEventMappers;
     private final Map<HubEventType, HubEventMapper> hubEventMappers;
 
-    public CollectorServiceImpl(KafkaClient kafkaClient,
-                                List<SensorEventMapper> sensorEventMapperList,
-                                List<HubEventMapper> hubEventMapperList) {
+    public CollectorServiceImpl(
+            KafkaClient kafkaClient,
+            List<SensorEventMapper> sensorEventMapperList,
+            List<HubEventMapper> hubEventMapperList
+    ) {
         this.kafkaClient = kafkaClient;
         this.sensorEventMappers = sensorEventMapperList.stream()
                 .collect(Collectors.toMap(SensorEventMapper::getSensorEventType, Function.identity()));
