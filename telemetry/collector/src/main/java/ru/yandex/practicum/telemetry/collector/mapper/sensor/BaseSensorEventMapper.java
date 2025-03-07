@@ -11,8 +11,6 @@ public abstract class BaseSensorEventMapper<T extends SpecificRecordBase> implem
 
     protected abstract T mapToAvro(SensorEvent event);
 
-    public abstract SensorEventType getSensorEventType();
-
     @Override
     public SensorEventAvro mapping(SensorEvent event) {
         if (!event.getType().equals(getSensorEventType())) {

@@ -43,7 +43,6 @@ public class KafkaClientConfig {
                 log.info("Send in topic {} the record: {}", topic, event);
                 Future<RecordMetadata> recordMetadataFuture = producer.send(record);
 
-                // Удалить ->
                 try {
                     log.info("Record successfully send. Record: {}", recordMetadataFuture.get());
                 } catch (ExecutionException | InterruptedException e) {
@@ -51,7 +50,6 @@ public class KafkaClientConfig {
                             InterruptedException.class.getSimpleName(),
                             e.getMessage());
                 }
-                // <-
             }
 
             @Override
