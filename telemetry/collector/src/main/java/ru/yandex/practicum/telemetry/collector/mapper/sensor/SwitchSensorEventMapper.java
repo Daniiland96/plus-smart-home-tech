@@ -11,7 +11,7 @@ import ru.yandex.practicum.telemetry.collector.model.sensor.SwitchSensorEvent;
 @Component
 public class SwitchSensorEventMapper extends BaseSensorEventMapper<SwitchSensorAvro> {
     @Override
-    protected SwitchSensorAvro mapToAvro(SensorEvent event) {
+    protected SwitchSensorAvro mapToAvroPayload(SensorEvent event) {
         SwitchSensorEvent sensorEvent = (SwitchSensorEvent) event;
         log.info("Mapper bring event to {}, result: {}", SwitchSensorEvent.class.getSimpleName(), sensorEvent);
         return SwitchSensorAvro.newBuilder()

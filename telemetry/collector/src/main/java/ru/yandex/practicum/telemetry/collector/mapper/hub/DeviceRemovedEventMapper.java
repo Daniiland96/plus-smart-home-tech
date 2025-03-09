@@ -12,7 +12,7 @@ import ru.yandex.practicum.telemetry.collector.model.hub.enums.HubEventType;
 public class DeviceRemovedEventMapper extends BaseHubEventMapper<DeviceRemovedEventAvro> {
 
     @Override
-    protected DeviceRemovedEventAvro mapToAvro(HubEvent event) {
+    protected DeviceRemovedEventAvro mapToAvroPayload(HubEvent event) {
         DeviceRemovedEvent hubEvent = (DeviceRemovedEvent) event;
         log.info("Mapper bring event to {}, result: {}", DeviceRemovedEvent.class.getSimpleName(), hubEvent);
 

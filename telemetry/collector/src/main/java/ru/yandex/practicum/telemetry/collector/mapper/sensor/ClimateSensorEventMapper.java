@@ -11,7 +11,7 @@ import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 @Component
 public class ClimateSensorEventMapper extends BaseSensorEventMapper<ClimateSensorAvro> {
     @Override
-    protected ClimateSensorAvro mapToAvro(SensorEvent event) {
+    protected ClimateSensorAvro mapToAvroPayload(SensorEvent event) {
         ClimateSensorEvent sensorEvent = (ClimateSensorEvent) event;
         log.info("Mapper bring event to {}, result: {}", ClimateSensorEvent.class.getSimpleName(), sensorEvent);
         return ClimateSensorAvro.newBuilder()

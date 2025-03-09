@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 public class DeviceActionMapper {
-    public DeviceActionAvro mapping(DeviceAction action) {
+    public DeviceActionAvro mapToAvro(DeviceAction action) {
         return DeviceActionAvro.newBuilder()
                 .setSensorId(action.getSensorId())
                 .setType(ActionTypeAvro.valueOf(action.getType().name()))
@@ -17,7 +17,7 @@ public class DeviceActionMapper {
                 .build();
     }
 
-    public List<DeviceActionAvro> mapping(List<DeviceAction> actions) {
-        return actions.stream().map(this::mapping).toList();
+    public List<DeviceActionAvro> mapToAvro(List<DeviceAction> actions) {
+        return actions.stream().map(this::mapToAvro).toList();
     }
 }

@@ -8,15 +8,15 @@ import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
 @Slf4j
 public abstract class BaseHubEventMapper<T extends SpecificRecordBase> implements HubEventMapper {
 
-    protected abstract T mapToAvro(HubEvent event);
+    protected abstract T mapToAvroPayload(HubEvent event);
 
     @Override
-    public HubEventAvro mapping(HubEvent event) {
+    public HubEventAvro mapToAvro(HubEvent event) {
         if (!event.getType().equals(getHubEventType())) {
             throw new IllegalArgumentException("Unknown type of event: " + event.getType());
         }
 
-        T payload = mapToAvro(event);
+        T payload = mapToAvroPayload(event);
 
         log.info("Create {}", HubEventAvro.class.getSimpleName());
         return HubEventAvro.newBuilder()

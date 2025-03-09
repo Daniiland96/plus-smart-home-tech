@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 public class ScenarioConditionMapper {
-    public ScenarioConditionAvro mapping(ScenarioCondition condition) {
+    public ScenarioConditionAvro mapToAvro(ScenarioCondition condition) {
         return ScenarioConditionAvro.newBuilder()
                 .setSensorId(condition.getSensorId())
                 .setType(ConditionTypeAvro.valueOf(condition.getType().name()))
@@ -19,7 +19,7 @@ public class ScenarioConditionMapper {
                 .build();
     }
 
-    public List<ScenarioConditionAvro> mapping(List<ScenarioCondition> conditions) {
-        return conditions.stream().map(this::mapping).toList();
+    public List<ScenarioConditionAvro> mapToAvro(List<ScenarioCondition> conditions) {
+        return conditions.stream().map(this::mapToAvro).toList();
     }
 }

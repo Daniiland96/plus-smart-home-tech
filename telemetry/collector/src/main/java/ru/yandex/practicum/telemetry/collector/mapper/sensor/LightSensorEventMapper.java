@@ -11,7 +11,7 @@ import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 @Component
 public class LightSensorEventMapper extends BaseSensorEventMapper<LightSensorAvro> {
     @Override
-    protected LightSensorAvro mapToAvro(SensorEvent event) {
+    protected LightSensorAvro mapToAvroPayload(SensorEvent event) {
         LightSensorEvent sensorEvent = (LightSensorEvent) event;
         log.info("Mapper bring event to {}, result: {}", LightSensorEvent.class.getSimpleName(), sensorEvent);
         return LightSensorAvro.newBuilder()

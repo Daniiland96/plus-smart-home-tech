@@ -16,14 +16,14 @@ public class ScenarioAddedEventMapper extends BaseHubEventMapper<ScenarioAddedEv
     private final DeviceActionMapper actionMapper;
 
     @Override
-    protected ScenarioAddedEventAvro mapToAvro(HubEvent event) {
+    protected ScenarioAddedEventAvro mapToAvroPayload(HubEvent event) {
         ScenarioAddedEvent hubEvent = (ScenarioAddedEvent) event;
         log.info("Mapper bring event to {}, result: {}", ScenarioAddedEvent.class.getSimpleName(), hubEvent);
 
         return ScenarioAddedEventAvro.newBuilder()
                 .setName(hubEvent.getName())
-                .setConditions(conditionMapper.mapping(hubEvent.getConditions()))
-                .setActions(actionMapper.mapping(hubEvent.getActions()))
+                .setConditions(conditionMapper.mapToAvro(hubEvent.getConditions()))
+                .setActions(actionMapper.mapToAvro(hubEvent.getActions()))
                 .build();
     }
 

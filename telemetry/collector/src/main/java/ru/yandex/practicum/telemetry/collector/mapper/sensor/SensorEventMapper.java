@@ -7,5 +7,5 @@ import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 public interface SensorEventMapper {
     SensorEventType getSensorEventType();
 
-    SensorEventAvro mapping(SensorEvent event);
+    SensorEventAvro mapToAvro(SensorEvent event);
 }

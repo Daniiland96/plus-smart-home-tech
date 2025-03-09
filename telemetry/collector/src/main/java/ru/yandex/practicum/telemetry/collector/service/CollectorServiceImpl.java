@@ -51,7 +51,7 @@ public class CollectorServiceImpl implements CollectorService {
             throw new IllegalArgumentException("There is no suitable mapper");
         }
 
-        SensorEventAvro eventAvro = eventMapper.mapping(event);
+        SensorEventAvro eventAvro = eventMapper.mapToAvro(event);
         log.info("In {} use {}.{} with param: {}",
                 CollectorService.class.getSimpleName(),
                 KafkaClient.class.getSimpleName(),
@@ -59,7 +59,6 @@ public class CollectorServiceImpl implements CollectorService {
                 eventAvro);
         kafkaClient.send(
                 sensorsEventsTopic,
-                null,
                 eventAvro.getTimestamp().toEpochMilli(),
                 eventAvro.getHubId(),
                 eventAvro
@@ -75,7 +74,7 @@ public class CollectorServiceImpl implements CollectorService {
             throw new IllegalArgumentException("There is no suitable mapper");
         }
 
-        HubEventAvro eventAvro = eventMapper.mapping(event);
+        HubEventAvro eventAvro = eventMapper.mapToAvro(event);
         log.info("In {} use {}.{} with param: {}",
                 CollectorService.class.getSimpleName(),
                 KafkaClient.class.getSimpleName(),
@@ -83,7 +82,6 @@ public class CollectorServiceImpl implements CollectorService {
                 eventAvro);
         kafkaClient.send(
                 hubsEventsTopic,
-                null,
                 eventAvro.getTimestamp().toEpochMilli(),
                 eventAvro.getHubId(),
                 eventAvro

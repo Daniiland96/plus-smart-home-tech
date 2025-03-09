@@ -7,5 +7,5 @@ import ru.yandex.practicum.telemetry.collector.model.hub.enums.HubEventType;
 public interface HubEventMapper {
     HubEventType getHubEventType();
 
-    HubEventAvro mapping(HubEvent event);
+    HubEventAvro mapToAvro(HubEvent event);
 }

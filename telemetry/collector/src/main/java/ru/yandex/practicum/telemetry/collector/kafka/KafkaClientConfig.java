@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -35,9 +36,9 @@ public class KafkaClientConfig {
         return new KafkaClient() {
 
             @Override
-            public void send(String topic, Integer partition, Long timestamp, String hubId, SpecificRecordBase event) {
+            public void send(String topic, Long timestamp, String hubId, SpecificRecordBase event) {
                 ProducerRecord<String, SpecificRecordBase> record =
-                        new ProducerRecord<>(topic, partition, timestamp, hubId, event);
+                        new ProducerRecord<>(topic, null, timestamp, hubId, event);
                 log.info("Send in topic {} the record: {}", topic, event);
                 Future<RecordMetadata> recordMetadataFuture = kafkaProducer.send(record);
 
@@ -54,7 +55,7 @@ public class KafkaClientConfig {
             public void close() {
                 kafkaProducer.flush();
                 log.info("Close {}", Producer.class.getSimpleName());
-                kafkaProducer.close();
+                kafkaProducer.close(Duration.ofSeconds(10));
             }
         };
     }
