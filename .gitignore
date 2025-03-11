@@ -125,3 +125,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/.github/workflows/stuff/start-hub-router.bat

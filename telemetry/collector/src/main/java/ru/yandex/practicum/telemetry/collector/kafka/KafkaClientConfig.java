@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Slf4j
@@ -41,14 +40,6 @@ public class KafkaClientConfig {
                         new ProducerRecord<>(topic, null, timestamp, hubId, event);
                 log.info("Send in topic {} the record: {}", topic, event);
                 Future<RecordMetadata> recordMetadataFuture = kafkaProducer.send(record);
-
-                try {
-                    log.info("Record successfully send. Record: {}", recordMetadataFuture.get());
-                } catch (ExecutionException | InterruptedException e) {
-                    log.info("Executions {} or {}, message: {}", ExecutionException.class.getSimpleName(),
-                            InterruptedException.class.getSimpleName(),
-                            e.getMessage());
-                }
             }
 
             @Override
