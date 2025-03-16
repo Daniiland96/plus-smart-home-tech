@@ -3,15 +3,13 @@ package ru.yandex.practicum.telemetry.collector.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.kafka.KafkaClient;
 import ru.yandex.practicum.telemetry.collector.mapper.hub.HubEventMapper;
 import ru.yandex.practicum.telemetry.collector.mapper.sensor.SensorEventMapper;
-import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
-import ru.yandex.practicum.telemetry.collector.model.hub.enums.HubEventType;
-import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
-import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 
 import java.util.List;
 import java.util.Map;
@@ -27,8 +25,8 @@ public class CollectorServiceImpl implements CollectorService {
     private String hubsEventsTopic;
 
     private final KafkaClient kafkaClient;
-    private final Map<SensorEventType, SensorEventMapper> sensorEventMappers;
-    private final Map<HubEventType, HubEventMapper> hubEventMappers;
+    private final Map<SensorEventProto.PayloadCase, SensorEventMapper> sensorEventMappers;
+    private final Map<HubEventProto.PayloadCase, HubEventMapper> hubEventMappers;
 
     public CollectorServiceImpl(
             KafkaClient kafkaClient,
@@ -43,10 +41,10 @@ public class CollectorServiceImpl implements CollectorService {
     }
 
     @Override
-    public void collectSensorEvent(SensorEvent event) {
+    public void collectSensorEvent(SensorEventProto event) {
         SensorEventMapper eventMapper;
-        if (sensorEventMappers.containsKey(event.getType())) {
-            eventMapper = sensorEventMappers.get(event.getType());
+        if (sensorEventMappers.containsKey(event.getPayloadCase())) {
+            eventMapper = sensorEventMappers.get(event.getPayloadCase());
         } else {
             throw new IllegalArgumentException("There is no suitable mapper");
         }
@@ -66,10 +64,10 @@ public class CollectorServiceImpl implements CollectorService {
     }
 
     @Override
-    public void collectHubEvent(HubEvent event) {
+    public void collectHubEvent(HubEventProto event) {
         HubEventMapper eventMapper;
-        if (hubEventMappers.containsKey(event.getType())) {
-            eventMapper = hubEventMappers.get(event.getType());
+        if (hubEventMappers.containsKey(event.getPayloadCase())) {
+            eventMapper = hubEventMappers.get(event.getPayloadCase());
         } else {
             throw new IllegalArgumentException("There is no suitable mapper");
         }

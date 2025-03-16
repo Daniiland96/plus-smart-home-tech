@@ -2,19 +2,18 @@ package ru.yandex.practicum.telemetry.collector.mapper.hub;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.grpc.telemetry.event.DeviceRemovedEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
-import ru.yandex.practicum.telemetry.collector.model.hub.DeviceRemovedEvent;
-import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
-import ru.yandex.practicum.telemetry.collector.model.hub.enums.HubEventType;
 
 @Slf4j
 @Component
 public class DeviceRemovedEventMapper extends BaseHubEventMapper<DeviceRemovedEventAvro> {
 
     @Override
-    protected DeviceRemovedEventAvro mapToAvroPayload(HubEvent event) {
-        DeviceRemovedEvent hubEvent = (DeviceRemovedEvent) event;
-        log.info("Mapper bring event to {}, result: {}", DeviceRemovedEvent.class.getSimpleName(), hubEvent);
+    protected DeviceRemovedEventAvro mapToAvroPayload(HubEventProto event) {
+        DeviceRemovedEventProto hubEvent = event.getDeviceRemoved();
+        log.info("Mapper bring event to {}, result: {}", DeviceRemovedEventProto.class.getSimpleName(), hubEvent);
 
         return DeviceRemovedEventAvro.newBuilder()
                 .setId(hubEvent.getId())
@@ -22,7 +21,7 @@ public class DeviceRemovedEventMapper extends BaseHubEventMapper<DeviceRemovedEv
     }
 
     @Override
-    public HubEventType getHubEventType() {
-        return HubEventType.DEVICE_REMOVED;
+    public HubEventProto.PayloadCase getHubEventType() {
+        return HubEventProto.PayloadCase.DEVICE_REMOVED;
     }
 }

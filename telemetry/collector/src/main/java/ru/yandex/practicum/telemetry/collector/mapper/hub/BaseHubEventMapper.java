@@ -2,18 +2,20 @@ package ru.yandex.practicum.telemetry.collector.mapper.hub;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
+
+import java.time.Instant;
 
 @Slf4j
 public abstract class BaseHubEventMapper<T extends SpecificRecordBase> implements HubEventMapper {
 
-    protected abstract T mapToAvroPayload(HubEvent event);
+    protected abstract T mapToAvroPayload(HubEventProto event);
 
     @Override
-    public HubEventAvro mapToAvro(HubEvent event) {
-        if (!event.getType().equals(getHubEventType())) {
-            throw new IllegalArgumentException("Unknown type of event: " + event.getType());
+    public HubEventAvro mapToAvro(HubEventProto event) {
+        if (!event.getPayloadCase().equals(getHubEventType())) {
+            throw new IllegalArgumentException("Unknown type of event: " + event.getPayloadCase());
         }
 
         T payload = mapToAvroPayload(event);
@@ -21,7 +23,10 @@ public abstract class BaseHubEventMapper<T extends SpecificRecordBase> implement
         log.info("Create {}", HubEventAvro.class.getSimpleName());
         return HubEventAvro.newBuilder()
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
+                .setTimestamp(Instant.ofEpochSecond(
+                        event.getTimestamp().getSeconds(),
+                        event.getTimestamp().getNanos()
+                ))
                 .setPayload(payload)
                 .build();
     }
