@@ -40,11 +40,13 @@ public class AggregatorServiceImpl implements AggregatorService {
 
     private Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
         if (!snapshots.containsKey(event.getHubId())) {
-            snapshots.put(event.getHubId(), new SensorsSnapshotAvro());
+            SensorsSnapshotAvro snapshot = new SensorsSnapshotAvro();
+            snapshot.setSensorsState(new HashMap<>());
+            snapshots.put(event.getHubId(), snapshot);
         }
 
         SensorsSnapshotAvro snapshot = snapshots.get(event.getHubId());
-        if (snapshot.getSensorsState() != null && snapshot.getSensorsState().containsKey(event.getId())) {
+        if (snapshot.getSensorsState().containsKey(event.getId())) {
             SensorStateAvro oldState = snapshot.getSensorsState().get(event.getId());
             if (oldState.getTimestamp().isAfter(event.getTimestamp())
                     || oldState.getData().equals(event.getPayload())) {
