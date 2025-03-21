@@ -59,7 +59,7 @@ public class AggregatorServiceImpl implements AggregatorService {
 
         snapshot.setHubId(event.getHubId());
         snapshot.setTimestamp(Instant.now());
-        snapshot.setSensorsState(Map.of(event.getId(), sensorState));
+        snapshot.getSensorsState().put(event.getId(), sensorState);
         snapshots.put(snapshot.getHubId(), snapshot);
         return Optional.of(snapshot);
     }
