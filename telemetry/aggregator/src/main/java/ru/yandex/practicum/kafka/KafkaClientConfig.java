@@ -20,14 +20,14 @@ public class KafkaClientConfig {
     @Bean
     @ConfigurationProperties(prefix = "collector.kafka.producer.properties")
     public Properties kafkaProducerProperties() {
-        log.info("Создание Properties для Producer");
+        log.info("{}: Создание Properties для Producer", KafkaClientConfig.class.getSimpleName());
         return new Properties();
     }
 
     @Bean
     @ConfigurationProperties(prefix = "collector.kafka.consumer.properties")
     public Properties kafkaConsumerProperties() {
-        log.info("Создание Properties для Consumer");
+        log.info("{}: Создание Properties для Consumer", KafkaClientConfig.class.getSimpleName());
         return new Properties();
     }
 
@@ -39,14 +39,14 @@ public class KafkaClientConfig {
 
             @Override
             public Producer<String, SpecificRecordBase> getProducer() {
-                log.info("Создание Producer");
+                log.info("{}: Создание Producer", KafkaClientConfig.class.getSimpleName());
                 kafkaProducer = new KafkaProducer<>(kafkaProducerProperties());
                 return kafkaProducer;
             }
 
             @Override
             public Consumer<String, SpecificRecordBase> getConsumer() {
-                log.info("Создание Consumer");
+                log.info("{}: Создание Consumer", KafkaClientConfig.class.getSimpleName());
                 kafkaConsumer = new KafkaConsumer<>(kafkaConsumerProperties());
                 return kafkaConsumer;
             }
@@ -57,9 +57,9 @@ public class KafkaClientConfig {
                     kafkaProducer.flush();
                     kafkaConsumer.commitSync();
                 } finally {
-                    log.info("Закрытие {}", Producer.class.getSimpleName());
+                    log.info("{}: Закрытие {}", Producer.class.getSimpleName(), KafkaClientConfig.class.getSimpleName());
                     kafkaProducer.close(Duration.ofSeconds(10));
-                    log.info("Закрытие {}", Consumer.class.getSimpleName());
+                    log.info("{}: Закрытие {}", Consumer.class.getSimpleName(), KafkaClientConfig.class.getSimpleName());
                     kafkaConsumer.close();
                 }
             }

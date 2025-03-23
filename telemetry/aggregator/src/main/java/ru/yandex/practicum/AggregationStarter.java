@@ -42,7 +42,7 @@ public class AggregationStarter {
             while (true) {
                 ConsumerRecords<String, SpecificRecordBase> records = consumer.poll(CONSUME_ATTEMPT_TIMEOUT);
                 for (ConsumerRecord<String, SpecificRecordBase> record : records) {
-                    log.info("Передаем сообщение для агрегации");
+                    log.info("{}: Передаем сообщение для агрегации", AggregationStarter.class.getSimpleName());
                     aggregatorService.aggregationSnapshot(producer, record.value());
                 }
                 consumer.commitAsync();
@@ -50,15 +50,15 @@ public class AggregationStarter {
         } catch (WakeupException ignored) {
 
         } catch (Exception e) {
-            log.error("Ошибка во время обработки событий от датчиков", e);
+            log.error("{}: Ошибка во время обработки событий от датчиков", AggregationStarter.class.getSimpleName(), e);
         } finally {
             try {
                 producer.flush();
                 consumer.commitSync();
             } finally {
-                log.info("Закрываем консьюмер");
+                log.info("{}: Закрываем консьюмер", AggregationStarter.class.getSimpleName());
                 consumer.close();
-                log.info("Закрываем продюсер");
+                log.info("{}: Закрываем продюсер", AggregationStarter.class.getSimpleName());
                 producer.close(Duration.ofSeconds(5));
             }
         }
