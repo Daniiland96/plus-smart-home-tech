@@ -1,0 +1,25 @@
+collector:
+  kafka:
+    consumer:
+      hub:
+        properties:
+          client.id: analyzerHubConsumer
+          group.id: analyzer.hub
+          bootstrap.servers: localhost:9092
+          key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          value.deserializer: ru.yandex.practicum.kafka.deserializer.HubEventDeserializer
+      snapshots:
+        properties:
+          client.id: analyzerSnapshotConsumer
+          group.id: analyzer.snapshot
+          bootstrap.servers: localhost:9092
+          key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          value.deserializer: ru.yandex.practicum.kafka.deserializer.SnapshotEventDeserializer
+    topics:
+      hubs-events: telemetry.hubs.v1
+      snapshots-events: telemetry.snapshots.v1
+
+spring:
+  output:
+    ansi:
+      enabled: always
