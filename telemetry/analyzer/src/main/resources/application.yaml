@@ -1,3 +1,31 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6542/analyzer
+    username: analyzer
+    password: analyzer
+
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
 collector:
   kafka:
     consumer:
@@ -8,7 +36,7 @@ collector:
           bootstrap.servers: localhost:9092
           key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
           value.deserializer: ru.yandex.practicum.kafka.deserializer.HubEventDeserializer
-      snapshots:
+      snapshot:
         properties:
           client.id: analyzerSnapshotConsumer
           group.id: analyzer.snapshot
@@ -18,8 +46,3 @@ collector:
     topics:
       hubs-events: telemetry.hubs.v1
       snapshots-events: telemetry.snapshots.v1
-
-spring:
-  output:
-    ansi:
-      enabled: always
