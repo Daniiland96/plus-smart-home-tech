@@ -7,6 +7,7 @@ import ru.yandex.practicum.grpc.telemetry.collector.CollectorControllerGrpc;
 import ru.yandex.practicum.grpc.telemetry.event.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -63,7 +64,33 @@ public class GrpcClient {
                                 .build()
                 )
                 .build();
+
+        HubEventProto addScenario = HubEventProto.newBuilder()
+                .setHubId(addEvent.getHubId())
+                .setTimestamp(Timestamp.newBuilder().setSeconds(Instant.now().getEpochSecond()).build())
+                .setScenarioAdded(
+                        ScenarioAddedEventProto.newBuilder()
+                                .setName("MyScenarioName")
+                                .addAllAction(List.of(
+                                        DeviceActionProto.newBuilder()
+                                                .setSensorId(addEvent.getDeviceAdded().getId())
+                                                .setType(ActionTypeProto.ACTIVATE)
+                                                .setValue(11)
+                                                .build()
+                                ))
+                                .addAllCondition(List.of(
+                                        ScenarioConditionProto.newBuilder()
+                                                .setSensorId(addEvent.getDeviceAdded().getId())
+                                                .setType(ConditionTypeProto.LUMINOSITY)
+                                                .setOperation(ConditionOperationProto.EQUALS)
+                                                .setIntValue(22)
+                                                .build()
+                                ))
+                                .build()
+                )
+                .build();
 //        collectorStub.collectHubEvent(addEvent);
-        collectorStub.collectHubEvent(deleteEvent);
+//        collectorStub.collectHubEvent(deleteEvent);
+        collectorStub.collectHubEvent(addScenario);
     }
 }
