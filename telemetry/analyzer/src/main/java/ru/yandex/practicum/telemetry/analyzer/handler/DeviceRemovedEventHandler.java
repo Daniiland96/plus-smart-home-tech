@@ -1,32 +1,33 @@
 package ru.yandex.practicum.telemetry.analyzer.handler;
 
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
+import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.telemetry.analyzer.model.Sensor;
 import ru.yandex.practicum.telemetry.analyzer.repository.SensorRepository;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DeviceAddedEventHandler implements HubEventHandler {
+public class DeviceRemovedEventHandler implements HubEventHandler {
     private final SensorRepository sensorRepository;
 
     @Override
     public String getHubEventType() {
-        return DeviceAddedEventAvro.class.getSimpleName();
+        return DeviceRemovedEventAvro.class.getSimpleName();
     }
 
     @Override
+    @Transactional
     public void handle(HubEventAvro event) {
-        DeviceAddedEventAvro payload = (DeviceAddedEventAvro) event.getPayload();
+        DeviceRemovedEventAvro payload = (DeviceRemovedEventAvro) event.getPayload();
         log.info("{}: Достаем из event, payload: {}", DeviceAddedEventHandler.class.getSimpleName(), payload);
-        Sensor sensor = new Sensor();
-        sensor.setId(payload.getId());
-        sensor.setHubId(event.getHubId());
-        log.info("{}: Сохраняем в БД sensor: {}", DeviceAddedEventHandler.class.getSimpleName(), sensor);
-        sensorRepository.save(sensor);
+
+        log.info("{}: Удаляем из БД sensor по hubId: {} и sensorId: {}",
+                DeviceRemovedEventAvro.class.getSimpleName(), event.getHubId(), payload.getId());
+        sensorRepository.deleteByIdAndHubId(payload.getId(), event.getHubId());
     }
 }

@@ -42,15 +42,17 @@ public class HubEventProcessor implements Runnable {
             while (true) {
                 ConsumerRecords<String, HubEventAvro> records = hubConsumer.poll(CONSUME_ATTEMPT_TIMEOUT);
                 for (ConsumerRecord<String, HubEventAvro> record : records) {
-                    log.info("{}: Полученное сообщение из kafka: {}", HubEventProcessor.class.getSimpleName(), record);
                     HubEventAvro event = record.value();
+                    log.info("{}: Полученное сообщение из kafka: {}", HubEventProcessor.class.getSimpleName(), event);
                     String eventPayloadName = event.getPayload().getClass().getSimpleName();
                     HubEventHandler eventHandler;
+
                     if (hubEventHandlers.containsKey(eventPayloadName)) {
                         eventHandler = hubEventHandlers.get(eventPayloadName);
                     } else {
                         throw new IllegalArgumentException("Подходящий handler не найден");
                     }
+                    log.info("{}: отправка сообщения в handler", HubEventProcessor.class.getSimpleName());
                     eventHandler.handle(event);
                 }
                 hubConsumer.commitAsync();
@@ -68,5 +70,4 @@ public class HubEventProcessor implements Runnable {
             }
         }
     }
-    // ...детали реализации...
 }
