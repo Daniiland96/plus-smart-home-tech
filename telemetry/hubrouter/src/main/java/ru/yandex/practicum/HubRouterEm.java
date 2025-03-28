@@ -11,7 +11,7 @@ public class HubRouterEm {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(HubRouterEm.class, args);
         GrpcClient client = context.getBean(GrpcClient.class);
-        client.collectSensorEvent();
-        client.collectHubEvent();
+//        client.collectSensorEvent();
+//        client.collectHubEvent();
     }
 }
