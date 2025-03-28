@@ -39,38 +39,15 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
         checkForSensors(payload.getConditions(), payload.getActions(), event.getHubId());
 
         Optional<Scenario> scenarioOpt = scenarioRepository.findByNameAndHubId(payload.getName(), event.getHubId());
-//        if (scenarioOpt.isEmpty()) {
-//            scenario = HubEventMapper.mapToScenario(payload, event.getHubId());
-//            log.info("{}: Создаем новый scenario: {}", ScenarioAddedEventHandler.class.getSimpleName(), scenario);
-//        } else {
-//            scenario = scenarioOpt.get();
-//            scenarioRepository.deleteByHubIdAndName(event.getHubId(), scenario.getName());
-//            conditionRepository.deleteAll(scenario.getConditions().values());
-//            actionRepository.deleteAll(scenario.getActions().values());
-//            log.info("{}: Удаляем старый scenario: {}", ScenarioAddedEventHandler.class.getSimpleName(), scenario);
-//        }
-
-//        if (scenarioOpt.isPresent()) {
-//            Scenario oldScenario = scenarioOpt.get();
-//            scenarioRepository.deleteByHubIdAndName(oldScenario.getHubId(), oldScenario.getName());
-////            scenarioRepository.flush();
-////            conditionRepository.deleteAll(oldScenario.getConditions().values());
-////            actionRepository.deleteAll(oldScenario.getActions().values());
-//            log.info("{}: Удаляем старый scenario: {}", ScenarioAddedEventHandler.class.getSimpleName(), oldScenario);
-//        }
-
+        log.info("{}: Удаляем старый scenario, если он есть", ScenarioAddedEventHandler.class.getSimpleName());
         scenarioOpt.ifPresent(oldScenario -> scenarioRepository.deleteByHubIdAndName(
                 oldScenario.getHubId()
                 , oldScenario.getName()));
         scenarioRepository.flush();
-        log.info("{}: Удаляем старый scenario, если он есть", ScenarioAddedEventHandler.class.getSimpleName());
 
         Scenario scenario = HubEventMapper.mapToScenario(payload, event.getHubId());
         log.info("{}: Сохраняем в БД новый scenario: {}", ScenarioAddedEventHandler.class.getSimpleName(), scenario);
-//        conditionRepository.saveAll(scenario.getConditions().values());
-//        actionRepository.saveAll(scenario.getActions().values());
         scenarioRepository.save(scenario);
-
     }
 
     private void checkForSensors(List<ScenarioConditionAvro> conditions, List<DeviceActionAvro> actions, String hubId) {
