@@ -5,5 +5,6 @@ public enum ConditionType {
     SWITCH,
     TEMPERATURE,
     CO2LEVEL,
-    HUMIDITY
+    HUMIDITY,
+    MOTION
 }
