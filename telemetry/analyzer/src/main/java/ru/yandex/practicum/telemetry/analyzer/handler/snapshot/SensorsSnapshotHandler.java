@@ -1,11 +1,10 @@
 package ru.yandex.practicum.telemetry.analyzer.handler.snapshot;
 
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.springframework.stereotype.Service;
-import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+import ru.yandex.practicum.telemetry.analyzer.client.HubRouterClient;
 import ru.yandex.practicum.telemetry.analyzer.model.Condition;
 import ru.yandex.practicum.telemetry.analyzer.model.ConditionOperation;
 import ru.yandex.practicum.telemetry.analyzer.model.Scenario;
@@ -17,16 +16,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
+@Component
 public class SensorsSnapshotHandler {
 
-    @GrpcClient("hubrouter")
-    private HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterController;
-
+    private final HubRouterClient hubRouterClient;
     private final ScenarioRepository scenarioRepository;
     private final Map<String, SensorHandler> sensorHandlers;
 
-    private SensorsSnapshotHandler(ScenarioRepository scenarioRepository, List<SensorHandler> sensorHandlers) {
+    private SensorsSnapshotHandler(HubRouterClient hubRouterClient,
+                                   ScenarioRepository scenarioRepository,
+                                   List<SensorHandler> sensorHandlers) {
+        this.hubRouterClient = hubRouterClient;
         this.scenarioRepository = scenarioRepository;
         this.sensorHandlers = sensorHandlers.stream()
                 .collect(Collectors.toMap(SensorHandler::getType, Function.identity()));
@@ -37,13 +37,17 @@ public class SensorsSnapshotHandler {
         if (scenarios.isEmpty()) {
             throw new IllegalArgumentException("У хаба с указанным hubId нет сценариев");
         }
+        log.info("{}: Выгружаем из БД все сценарии по hubId: {}, scenarios: {}",
+                SensorsSnapshotHandler.class.getSimpleName(), snapshot.getHubId(), scenarios);
         List<Scenario> validScenarios = scenarios.stream()
                 .filter(scenario -> validateScenarioConditions(scenario, snapshot))
                 .toList();
-
+        log.info("{}: Список подходящих сценариев: {}", SensorsSnapshotHandler.class.getSimpleName(), validScenarios);
+        hubRouterClient.send(validScenarios);
     }
 
     private Boolean validateScenarioConditions(Scenario scenario, SensorsSnapshotAvro snapshot) {
+        log.info("{}: Проверяем сценарии", SensorsSnapshotHandler.class.getSimpleName());
         Map<String, Condition> conditions = scenario.getConditions();
         Map<String, SensorStateAvro> sensorStates = snapshot.getSensorsState();
         if (snapshot == null || snapshot.getSensorsState().isEmpty()) {
@@ -69,7 +73,7 @@ public class SensorsSnapshotHandler {
         if (value == null) {
             return false;
         }
-
+        log.info("{}: Получаем value из SensorStateAvro: {}", SensorsSnapshotHandler.class.getSimpleName(), value);
         return getConditionOperation(condition, value);
     }
 
