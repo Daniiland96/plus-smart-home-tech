@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 @Service
 public class HubRouterClient {
-    @GrpcClient("hubrouter")
+    @GrpcClient("hub-router")
     private HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterController;
 
     public void send(Scenario scenario) {
