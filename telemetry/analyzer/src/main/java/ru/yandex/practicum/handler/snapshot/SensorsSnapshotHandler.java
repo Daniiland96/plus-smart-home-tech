@@ -23,7 +23,7 @@ public class SensorsSnapshotHandler {
     private final ScenarioRepository scenarioRepository;
     private final Map<String, SensorHandler> sensorHandlers;
 
-    private SensorsSnapshotHandler(HubRouterClient hubRouterClient,
+    public SensorsSnapshotHandler(HubRouterClient hubRouterClient,
                                    ScenarioRepository scenarioRepository,
                                    List<SensorHandler> sensorHandlers) {
         this.hubRouterClient = hubRouterClient;
@@ -65,18 +65,19 @@ public class SensorsSnapshotHandler {
         if (sensorHandlers.containsKey(sensorState.getData().getClass().getSimpleName())) {
             handler = sensorHandlers.get(sensorState.getData().getClass().getSimpleName());
         } else {
-            throw new IllegalArgumentException("Подходящий handler не найден");
+            throw new IllegalArgumentException("Подходящий handler не найден: " + sensorState.getData().getClass().getSimpleName());
         }
 
         Integer value = handler.handleToValue(sensorState, condition.getType());
+        log.info("{}: Получаем value из SensorStateAvro: {}", SensorsSnapshotHandler.class.getSimpleName(), value);
         if (value == null) {
             return false;
         }
-        log.info("{}: Получаем value из SensorStateAvro: {}", SensorsSnapshotHandler.class.getSimpleName(), value);
         return getConditionOperation(condition, value);
     }
 
     private Boolean getConditionOperation(Condition condition, Integer value) {
+        log.info("{}: Обрабатываем sensorCondition: {}", SensorsSnapshotHandler.class.getSimpleName(), condition.getOperation());
         return switch (condition.getOperation()) {
             case ConditionOperation.EQUALS -> value.equals(condition.getValue());
             case ConditionOperation.GREATER_THAN -> value > condition.getValue();

@@ -9,7 +9,7 @@ import ru.yandex.practicum.model.ConditionType;
 public class MotionSensorHandler implements SensorHandler {
     @Override
     public String getType() {
-        return MotionSensorAvro.class.getTypeName();
+        return MotionSensorAvro.class.getSimpleName();
     }
 
     @Override

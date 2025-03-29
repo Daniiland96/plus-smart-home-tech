@@ -9,7 +9,7 @@ import ru.yandex.practicum.model.ConditionType;
 public class SwitchSensorHandler implements SensorHandler {
     @Override
     public String getType() {
-        return SwitchSensorAvro.class.getTypeName();
+        return SwitchSensorAvro.class.getSimpleName();
     }
 
     @Override

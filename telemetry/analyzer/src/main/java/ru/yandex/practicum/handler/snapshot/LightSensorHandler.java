@@ -9,7 +9,7 @@ import ru.yandex.practicum.model.ConditionType;
 public class LightSensorHandler implements SensorHandler {
     @Override
     public String getType() {
-        return LightSensorAvro.class.getTypeName();
+        return LightSensorAvro.class.getSimpleName();
     }
 
     @Override

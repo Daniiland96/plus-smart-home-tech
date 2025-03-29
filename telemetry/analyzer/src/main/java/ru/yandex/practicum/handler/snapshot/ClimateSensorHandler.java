@@ -9,7 +9,7 @@ import ru.yandex.practicum.model.ConditionType;
 public class ClimateSensorHandler implements SensorHandler {
     @Override
     public String getType() {
-        return ClimateSensorAvro.class.getTypeName();
+        return ClimateSensorAvro.class.getSimpleName();
     }
 
     @Override
