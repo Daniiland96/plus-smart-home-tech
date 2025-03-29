@@ -37,12 +37,11 @@ public class SensorsSnapshotHandler {
         if (scenarios.isEmpty()) {
             throw new IllegalArgumentException("У хаба с указанным hubId нет сценариев");
         }
-        log.info("{}: Выгружаем из БД все сценарии по hubId: {}, scenarios: {}",
-                SensorsSnapshotHandler.class.getSimpleName(), snapshot.getHubId(), scenarios);
+        log.info("{}: Выгружаем из БД все сценарии по hubId: {}",
+                SensorsSnapshotHandler.class.getSimpleName(), snapshot.getHubId());
         List<Scenario> validScenarios = scenarios.stream()
                 .filter(scenario -> validateScenarioConditions(scenario, snapshot))
                 .toList();
-        log.info("{}: Список подходящих сценариев: {}", SensorsSnapshotHandler.class.getSimpleName(), validScenarios);
         hubRouterClient.send(validScenarios);
     }
 
