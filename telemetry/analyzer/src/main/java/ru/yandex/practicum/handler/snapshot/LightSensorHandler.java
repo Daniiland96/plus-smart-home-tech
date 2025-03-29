@@ -17,7 +17,7 @@ public class LightSensorHandler implements SensorHandler {
         LightSensorAvro sensorAvro = (LightSensorAvro) stateAvro.getData();
 
         return switch (type) {
-            case LUMINOSITY -> sensorAvro.getLuminosityl();
+            case LUMINOSITY -> sensorAvro.getLuminosity();
             default -> null;
         };
     }

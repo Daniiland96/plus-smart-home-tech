@@ -16,12 +16,6 @@ public class TemperatureSensorEventMapper extends BaseSensorEventMapper<Temperat
         TemperatureSensorEventProto sensorEvent = event.getTemperatureSensorEvent();
         log.info("Mapper bring event to {}, result: {}", TemperatureSensorEventProto.class.getSimpleName(), sensorEvent);
         return TemperatureSensorAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(Instant.ofEpochSecond(
-                        event.getTimestamp().getSeconds(),
-                        event.getTimestamp().getNanos()
-                ))
                 .setTemperatureC(sensorEvent.getTemperatureC())
                 .setTemperatureF(sensorEvent.getTemperatureF())
                 .build();
