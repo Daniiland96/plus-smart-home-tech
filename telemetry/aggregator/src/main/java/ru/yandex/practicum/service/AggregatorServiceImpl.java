@@ -6,7 +6,6 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.kafka.KafkaClientConfig;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
@@ -19,7 +18,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class AggregatorServiceImpl implements AggregatorService {
-    @Value("${collector.kafka.topics.snapshots-events}")
+    @Value("${kafka.topics.snapshots-events}")
     private String snapshotsEventsTopic;
     private Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
 
