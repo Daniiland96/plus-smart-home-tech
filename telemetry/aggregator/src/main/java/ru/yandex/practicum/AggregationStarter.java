@@ -23,9 +23,9 @@ public class AggregationStarter {
     private final Consumer<String, SpecificRecordBase> consumer;
     private final AggregatorService aggregatorService;
 
-    @Value("${collector.kafka.topics.sensors-events}")
+    @Value("${kafka.topics.sensors-events}")
     private String sensorsEventsTopic;
-    @Value("${collector.kafka.topics.snapshots-events}")
+    @Value("${kafka.topics.snapshots-events}")
     private String snapshotsEventsTopic;
     private static final Duration CONSUME_ATTEMPT_TIMEOUT = Duration.ofMillis(1000);
 

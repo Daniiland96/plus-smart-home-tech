@@ -18,14 +18,14 @@ import java.util.Properties;
 public class KafkaClientConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "collector.kafka.producer.properties")
+    @ConfigurationProperties(prefix = "kafka.producer.properties")
     public Properties kafkaProducerProperties() {
         log.info("{}: Создание Properties для Producer", KafkaClientConfig.class.getSimpleName());
         return new Properties();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "collector.kafka.consumer.properties")
+    @ConfigurationProperties(prefix = "kafka.consumer.properties")
     public Properties kafkaConsumerProperties() {
         log.info("{}: Создание Properties для Consumer", KafkaClientConfig.class.getSimpleName());
         return new Properties();

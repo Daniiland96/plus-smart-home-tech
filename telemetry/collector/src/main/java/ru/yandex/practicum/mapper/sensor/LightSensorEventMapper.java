@@ -15,7 +15,7 @@ public class LightSensorEventMapper extends BaseSensorEventMapper<LightSensorAvr
         log.info("Mapper bring event to {}, result: {}", LightSensorEventProto.class.getSimpleName(), sensorEvent);
         return LightSensorAvro.newBuilder()
                 .setLinkQuality(sensorEvent.getLinkQuality())
-                .setLuminosityl(sensorEvent.getLuminosity())
+                .setLuminosity(sensorEvent.getLuminosity())
                 .build();
     }
 

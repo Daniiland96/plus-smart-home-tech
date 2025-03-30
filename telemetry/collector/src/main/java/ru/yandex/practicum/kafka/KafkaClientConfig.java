@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
 public class KafkaClientConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "collector.kafka.producer.properties")
+    @ConfigurationProperties(prefix = "kafka.producer.properties")
     public Properties kafkaProducerProperties() {
         return new Properties();
     }
