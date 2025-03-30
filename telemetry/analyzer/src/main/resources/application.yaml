@@ -14,7 +14,7 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:6542/analyzer
+    url: jdbc:postgresql://localhost:5433/analyzer
     username: analyzer
     password: analyzer
 
@@ -32,17 +32,18 @@ collector:
       hub:
         properties:
           client.id: analyzerHubConsumer
-          group.id: analyzer.hub
+          group.id: analyzer-hub
           bootstrap.servers: localhost:9092
           key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
           value.deserializer: deserializer.HubEventDeserializer
       snapshot:
         properties:
           client.id: analyzerSnapshotConsumer
-          group.id: analyzer.snapshot
+          group.id: analyzer-snapshot
           bootstrap.servers: localhost:9092
           key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
           value.deserializer: deserializer.SnapshotEventDeserializer
     topics:
+      sensors-events: telemetry.sensors.v1
       hubs-events: telemetry.hubs.v1
       snapshots-events: telemetry.snapshots.v1

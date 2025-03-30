@@ -32,7 +32,10 @@ public class HubRouterClient {
     }
 
     public void send(List<Scenario> scenarios) {
-        scenarios.stream().peek(this::send);
+//        scenarios.stream().peek(this::send);
+        for (Scenario scenario : scenarios) {
+            send(scenario);
+        }
     }
 
     private DeviceActionRequest mapToDeviceActionRequest(String sensorId, Action action, Scenario scenario) {

@@ -7,7 +7,7 @@ kafka:
   consumer:
     properties:
       client.id: AggregatorConsumer
-      group.id: aggregator.group
+      group.id: aggregator-group
       bootstrap.servers: localhost:9092
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value.deserializer: deserializer.SensorEventDeserializer
