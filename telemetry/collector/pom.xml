@@ -11,8 +11,6 @@
 
     <artifactId>collector</artifactId>
 
-
-
     <dependencies>
         <!--        Module-->
         <dependency>

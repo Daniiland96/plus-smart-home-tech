@@ -6,8 +6,6 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.TemperatureSensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
 
-import java.time.Instant;
-
 @Slf4j
 @Component
 public class TemperatureSensorEventMapper extends BaseSensorEventMapper<TemperatureSensorAvro> {

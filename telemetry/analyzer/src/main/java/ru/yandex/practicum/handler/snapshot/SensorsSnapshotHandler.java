@@ -24,8 +24,8 @@ public class SensorsSnapshotHandler {
     private final Map<String, SensorHandler> sensorHandlers;
 
     public SensorsSnapshotHandler(HubRouterClient hubRouterClient,
-                                   ScenarioRepository scenarioRepository,
-                                   List<SensorHandler> sensorHandlers) {
+                                  ScenarioRepository scenarioRepository,
+                                  List<SensorHandler> sensorHandlers) {
         this.hubRouterClient = hubRouterClient;
         this.scenarioRepository = scenarioRepository;
         this.sensorHandlers = sensorHandlers.stream()

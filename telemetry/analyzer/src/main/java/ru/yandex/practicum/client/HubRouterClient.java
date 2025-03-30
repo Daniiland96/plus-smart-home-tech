@@ -32,7 +32,6 @@ public class HubRouterClient {
     }
 
     public void send(List<Scenario> scenarios) {
-//        scenarios.stream().peek(this::send);
         for (Scenario scenario : scenarios) {
             send(scenario);
         }
