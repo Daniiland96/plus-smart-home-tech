@@ -1,9 +1,12 @@
 package ru.yandex.practicum.processor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,6 +15,7 @@ import ru.yandex.practicum.kafka.KafkaClient;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -23,7 +27,10 @@ public class HubEventProcessor implements Runnable {
 
     private final Consumer<String, HubEventAvro> hubConsumer;
     private final Map<String, HubEventHandler> hubEventHandlers;
+
+    private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
     private static final Duration CONSUME_ATTEMPT_TIMEOUT = Duration.ofMillis(1000);
+
 
     @Value("${collector.kafka.topics.hubs-events}")
     private String hubEventsTopic;
@@ -41,21 +48,27 @@ public class HubEventProcessor implements Runnable {
             hubConsumer.subscribe(List.of(hubEventsTopic));
             while (true) {
                 ConsumerRecords<String, HubEventAvro> records = hubConsumer.poll(CONSUME_ATTEMPT_TIMEOUT);
-                for (ConsumerRecord<String, HubEventAvro> record : records) {
-                    HubEventAvro event = record.value();
-                    log.info("{}: Полученное сообщение из kafka: {}", HubEventProcessor.class.getSimpleName(), event);
-                    String eventPayloadName = event.getPayload().getClass().getSimpleName();
-                    HubEventHandler eventHandler;
+                if (!records.isEmpty()) {
+                    int count = 0;
+                    for (ConsumerRecord<String, HubEventAvro> record : records) {
+                        HubEventAvro event = record.value();
+                        log.info("{}: Полученное сообщение из kafka: {}", HubEventProcessor.class.getSimpleName(), event);
+                        String eventPayloadName = event.getPayload().getClass().getSimpleName();
+                        HubEventHandler eventHandler;
 
-                    if (hubEventHandlers.containsKey(eventPayloadName)) {
-                        eventHandler = hubEventHandlers.get(eventPayloadName);
-                    } else {
-                        throw new IllegalArgumentException("Подходящий handler не найден");
+                        if (hubEventHandlers.containsKey(eventPayloadName)) {
+                            eventHandler = hubEventHandlers.get(eventPayloadName);
+                        } else {
+                            throw new IllegalArgumentException("Подходящий handler не найден");
+                        }
+                        log.info("{}: отправка сообщения в handler", HubEventProcessor.class.getSimpleName());
+                        eventHandler.handle(event);
+
+                        manageOffsets(record, count, hubConsumer);
+                        count++;
                     }
-                    log.info("{}: отправка сообщения в handler", HubEventProcessor.class.getSimpleName());
-                    eventHandler.handle(event);
+                    hubConsumer.commitAsync();
                 }
-                hubConsumer.commitAsync();
             }
         } catch (WakeupException ignored) {
 
@@ -68,6 +81,26 @@ public class HubEventProcessor implements Runnable {
                 log.info("{}: Закрываем консьюмер", HubEventProcessor.class.getSimpleName());
                 hubConsumer.close();
             }
+        }
+    }
+
+    private static void manageOffsets(
+            ConsumerRecord<String, HubEventAvro> record,
+            int count,
+            Consumer<String, HubEventAvro> consumer
+    ) {
+        // обновляем текущий оффсет для топика-партиции
+        currentOffsets.put(
+                new TopicPartition(record.topic(), record.partition()),
+                new OffsetAndMetadata(record.offset() + 1)
+        );
+
+        if (count % 10 == 0) {
+            consumer.commitAsync(currentOffsets, (offsets, exception) -> {
+                if (exception != null) {
+                    log.warn("Ошибка во время фиксации оффсетов: {}", offsets, exception);
+                }
+            });
         }
     }
 }

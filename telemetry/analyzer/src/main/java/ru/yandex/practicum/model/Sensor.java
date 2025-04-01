@@ -15,7 +15,7 @@ import java.util.Set;
 @ToString
 public class Sensor {
     @Id
-    String id;
+    private String id;
 
     @Column(name = "hub_id")
     private String hubId;

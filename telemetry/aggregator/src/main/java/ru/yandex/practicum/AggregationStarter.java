@@ -5,7 +5,9 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,7 +15,9 @@ import ru.yandex.practicum.kafka.KafkaClient;
 import ru.yandex.practicum.service.AggregatorService;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -29,6 +33,8 @@ public class AggregationStarter {
     private String snapshotsEventsTopic;
     private static final Duration CONSUME_ATTEMPT_TIMEOUT = Duration.ofMillis(1000);
 
+    private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
+
     public AggregationStarter(KafkaClient kafkaClient, AggregatorService aggregatorService) {
         this.producer = kafkaClient.getProducer();
         this.consumer = kafkaClient.getConsumer();
@@ -41,11 +47,17 @@ public class AggregationStarter {
             consumer.subscribe(List.of(sensorsEventsTopic));
             while (true) {
                 ConsumerRecords<String, SpecificRecordBase> records = consumer.poll(CONSUME_ATTEMPT_TIMEOUT);
-                for (ConsumerRecord<String, SpecificRecordBase> record : records) {
-                    log.info("{}: Передаем сообщение для агрегации", AggregationStarter.class.getSimpleName());
-                    aggregatorService.aggregationSnapshot(producer, record.value());
+                if (!records.isEmpty()) {
+                    int count = 0;
+                    for (ConsumerRecord<String, SpecificRecordBase> record : records) {
+                        log.info("{}: Передаем сообщение для агрегации", AggregationStarter.class.getSimpleName());
+                        aggregatorService.aggregationSnapshot(producer, record.value());
+
+                        manageOffsets(record, count, consumer);
+                        count++;
+                    }
+                    consumer.commitAsync();
                 }
-                consumer.commitAsync();
             }
         } catch (WakeupException ignored) {
 
@@ -61,6 +73,26 @@ public class AggregationStarter {
                 log.info("{}: Закрываем продюсер", AggregationStarter.class.getSimpleName());
                 producer.close(Duration.ofSeconds(5));
             }
+        }
+    }
+
+    private static void manageOffsets(
+            ConsumerRecord<String, SpecificRecordBase> record,
+            int count,
+            Consumer<String, SpecificRecordBase> consumer
+    ) {
+        // обновляем текущий оффсет для топика-партиции
+        currentOffsets.put(
+                new TopicPartition(record.topic(), record.partition()),
+                new OffsetAndMetadata(record.offset() + 1)
+        );
+
+        if (count % 10 == 0) {
+            consumer.commitAsync(currentOffsets, (offsets, exception) -> {
+                if (exception != null) {
+                    log.warn("Ошибка во время фиксации оффсетов: {}", offsets, exception);
+                }
+            });
         }
     }
 }
