@@ -1,6 +1,3 @@
-application:
-  name: aggregator
-
 kafka:
   producer:
     properties:
@@ -24,10 +21,3 @@ spring:
   output:
     ansi:
       enabled: always
-
-logging:
-  level:
-    ru.yandex.practicum: DEBUG
-    org:
-      springframework: ERROR
-      apache.kafka: ERROR
