@@ -1,0 +1,42 @@
+package ru.yandex.practicum.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import ru.yandex.practicum.dto.ProductCategory;
+import ru.yandex.practicum.dto.ProductState;
+import ru.yandex.practicum.dto.QuantityState;
+
+@Entity
+@Table(name = "products")
+@Getter
+@Setter
+@ToString
+public class Product {
+    @Id
+    @Column(name = "product_id")
+    private String productId;
+
+    @Column(name = "product_name")
+    private String productName;
+
+    private String description;
+
+    @Column(name = "image_src")
+    private String imageSrc;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "quantity_state")
+    private QuantityState quantityState;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "product_state")
+    private ProductState productState;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "product_category")
+    private ProductCategory productCategory;
+
+    private Double price;
+}
