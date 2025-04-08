@@ -8,6 +8,8 @@ import ru.yandex.practicum.dto.ProductCategory;
 import ru.yandex.practicum.dto.ProductState;
 import ru.yandex.practicum.dto.QuantityState;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "products")
 @Getter
@@ -15,8 +17,9 @@ import ru.yandex.practicum.dto.QuantityState;
 @ToString
 public class Product {
     @Id
-    @Column(name = "product_id")
-    private String productId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "product_id", updatable = false, nullable = false)
+    private UUID productId;
 
     @Column(name = "product_name")
     private String productName;

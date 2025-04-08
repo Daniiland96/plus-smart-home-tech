@@ -7,11 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @ToString
 public class ProductDto {
-    @NotBlank
     private String productId;
 
     @NotBlank

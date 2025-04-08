@@ -11,7 +11,7 @@ public class ShoppingStoreController implements ShoppingStoreApi {
 
     @Override
     public ProductDto createProduct(ProductDto productDto) {
-        log.info(productDto.toString());
+        log.info("DTO на создаие нового продукта: {}", productDto.toString());
         return productDto;
     }
 }

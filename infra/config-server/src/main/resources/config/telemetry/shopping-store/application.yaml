@@ -14,9 +14,9 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/analyzer
-    username: analyzer
-    password: analyzer
+    url: jdbc:postgresql://localhost:5433/smart-home-tech
+    username: smart-home-tech
+    password: smart-home-tech
 
 server:
   port: 0
