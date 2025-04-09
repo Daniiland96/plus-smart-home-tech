@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.model.Product;
 
+import java.util.List;
+
 @Slf4j
 public class ShoppingStoreMapper {
     public static Product mapToProduct(ProductDto productDto) {
@@ -31,5 +33,9 @@ public class ShoppingStoreMapper {
         productDto.setPrice(product.getPrice());
         log.info("Результат маппинга product в productDto: {}", productDto);
         return productDto;
+    }
+
+    public static List<ProductDto> mapToProductDto(List<Product> products) {
+        return products.stream().map(ShoppingStoreMapper::mapToProductDto).toList();
     }
 }
