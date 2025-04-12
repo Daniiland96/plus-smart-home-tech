@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.yandex.practicum.dto.CartState;
+import ru.yandex.practicum.dto.shoppingCart.CartState;
 
 import java.util.HashMap;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package ru.yandex.practicum.mapper;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.dto.ProductDto;
+import ru.yandex.practicum.dto.shoppingStore.ProductDto;
 import ru.yandex.practicum.model.Product;
 
 import java.util.List;

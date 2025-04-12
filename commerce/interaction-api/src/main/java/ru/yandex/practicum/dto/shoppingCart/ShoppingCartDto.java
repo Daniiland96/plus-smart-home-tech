@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dto;
+package ru.yandex.practicum.dto.shoppingCart;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,5 +17,5 @@ public class ShoppingCartDto {
     private String shoppingCartId;
 
     @NotNull
-    private Map<String, Integer> products;
+    private Map<UUID, Integer> products;
 }

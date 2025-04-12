@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.yandex.practicum.dto.ProductCategory;
-import ru.yandex.practicum.dto.ProductState;
-import ru.yandex.practicum.dto.QuantityState;
+import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
+import ru.yandex.practicum.dto.shoppingStore.ProductState;
+import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 
 import java.util.UUID;
 

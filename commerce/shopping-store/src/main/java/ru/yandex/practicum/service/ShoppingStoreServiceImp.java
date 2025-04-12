@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.dto.ProductCategory;
-import ru.yandex.practicum.dto.ProductDto;
-import ru.yandex.practicum.dto.ProductState;
-import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
+import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
+import ru.yandex.practicum.dto.shoppingStore.ProductDto;
+import ru.yandex.practicum.dto.shoppingStore.ProductState;
+import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.exeption.ProductNotFoundException;
 import ru.yandex.practicum.mapper.ShoppingStoreMapper;
 import ru.yandex.practicum.model.Product;
@@ -86,7 +86,7 @@ public class ShoppingStoreServiceImp implements ShoppingStoreService {
     }
 
     @Override
-    public Boolean SetProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
+    public Boolean setProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
         Product product = storeRepository.findById(quantityStateRequest.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("Product с id: "
                         + quantityStateRequest.getProductId() + " не найден"));

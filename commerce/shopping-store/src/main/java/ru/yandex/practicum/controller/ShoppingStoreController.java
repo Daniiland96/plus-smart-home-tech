@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.shoppingStore.ShoppingStoreApi;
-import ru.yandex.practicum.dto.ProductCategory;
-import ru.yandex.practicum.dto.ProductDto;
-import ru.yandex.practicum.dto.SetProductQuantityStateRequest;
+import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
+import ru.yandex.practicum.dto.shoppingStore.ProductDto;
+import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.service.ShoppingStoreService;
 
 import java.util.List;
@@ -50,8 +50,8 @@ public class ShoppingStoreController implements ShoppingStoreApi {
     }
 
     @Override
-    public Boolean SetProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
+    public Boolean setProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
         log.info("Запрос на обновление QuantityState продукта: {}", quantityStateRequest);
-        return storeService.SetProductQuantityState(quantityStateRequest);
+        return storeService.setProductQuantityState(quantityStateRequest);
     }
 }
