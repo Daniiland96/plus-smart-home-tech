@@ -7,10 +7,11 @@ import lombok.ToString;
 import ru.yandex.practicum.dto.shoppingCart.CartState;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "shopping_cart")
+@Table(name = "shopping_carts")
 @Getter
 @Setter
 @ToString
@@ -20,8 +21,7 @@ public class ShoppingCart {
     @Column(name = "shopping_cart_id", updatable = false, nullable = false)
     private UUID shoppingCartId;
 
-    @Column(name = "user_name")
-    private String userName;
+    private String username;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "cart_state")
@@ -31,5 +31,5 @@ public class ShoppingCart {
     @CollectionTable(name = "products_in_shopping_carts", joinColumns = @JoinColumn(name = "shopping_cart_id"))
     @MapKeyColumn(name = "product_id")
     @Column(name = "quantity")
-    private HashMap<UUID, Integer> products;
+    private Map<UUID, Integer> products;
 }

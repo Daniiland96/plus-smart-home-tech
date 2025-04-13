@@ -1,4 +1,4 @@
-package ru.yandex.practicum.exeption;
+package ru.yandex.practicum.exception;
 
 public class SpecifiedProductAlreadyInWarehouseException extends RuntimeException {
     public SpecifiedProductAlreadyInWarehouseException(String message) {

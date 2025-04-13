@@ -10,9 +10,9 @@ import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
-import ru.yandex.practicum.exeption.NoSpecifiedProductInWarehouseException;
-import ru.yandex.practicum.exeption.ProductInShoppingCartLowQuantityInWarehouse;
-import ru.yandex.practicum.exeption.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
+import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
+import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.feignClient.ShoppingStoreFeignClient;
 import ru.yandex.practicum.mapper.WarehouseMapper;
 import ru.yandex.practicum.model.WarehouseProduct;
@@ -49,6 +49,7 @@ public class WarehouseServiceImp implements WarehouseService {
         log.info("Продукты из корзины имеющиеся на складе: {}", warehouseProductsList);
         Map<UUID, WarehouseProduct> warehouseProductsMap = warehouseProductsList.stream()
                 .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
+        log.info("Создаем Map из продуктов имеющиеся на складе: {}", warehouseProductsMap);
 
         checkAvailabilityProductsInWarehouse(productsInCart.keySet(), warehouseProductsMap.keySet()); // проверка наличия продуктов на складе
         checkQuantity(productsInCart, warehouseProductsMap); // проверка количества продуктов на складе
@@ -88,6 +89,7 @@ public class WarehouseServiceImp implements WarehouseService {
 
     private void checkAvailabilityProductsInWarehouse(Set<UUID> productsInCart, Set<UUID> productsInWarehouse) {
         productsInCart.removeAll(productsInWarehouse);
+        log.info("Продукты которых нет на складе: {}", productsInCart);
         if (!productsInCart.isEmpty()) {
             throw new NoSpecifiedProductInWarehouseException("На складе нет продуктов со следующими id: " + productsInCart);
         }
@@ -100,7 +102,8 @@ public class WarehouseServiceImp implements WarehouseService {
                 notAvailabilityProducts.add(id);
             }
         }
-        if (notAvailabilityProducts.isEmpty()) {
+        log.info("Продукты которых не хватает на складе: {}", notAvailabilityProducts);
+        if (!notAvailabilityProducts.isEmpty()) {
             throw new ProductInShoppingCartLowQuantityInWarehouse("На складе не хватает продуктов со следующими id: "
                     + notAvailabilityProducts);
         }
