@@ -1,1 +1,0 @@
-delete from warehouse_products;

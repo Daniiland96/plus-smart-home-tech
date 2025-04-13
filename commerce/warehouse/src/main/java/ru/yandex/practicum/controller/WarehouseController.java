@@ -1,9 +1,7 @@
 package ru.yandex.practicum.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.warehouse.WarehouseApi;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
@@ -38,7 +36,7 @@ public class WarehouseController implements WarehouseApi {
     }
 
     @Override
-    public AddressDto getAddressWarehouse(){
+    public AddressDto getAddressWarehouse() {
         log.info("Запрос на получение адреса склада");
         return warehouseService.getAddressWarehouse();
     }

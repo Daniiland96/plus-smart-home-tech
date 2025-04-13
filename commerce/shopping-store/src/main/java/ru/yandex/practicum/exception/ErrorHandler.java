@@ -1,6 +1,7 @@
 package ru.yandex.practicum.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,8 +18,10 @@ public class ErrorHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({IllegalArgumentException.class})
-    public ErrorResponse handleIllegalArgumentException(final Exception e) {
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            MethodArgumentNotValidException.class})
+    public ErrorResponse handleBadRequestException(final Exception e) {
         return new ErrorResponse(e.getMessage());
     }
 

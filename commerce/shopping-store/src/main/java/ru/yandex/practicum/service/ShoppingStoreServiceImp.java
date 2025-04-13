@@ -92,7 +92,7 @@ public class ShoppingStoreServiceImp implements ShoppingStoreService {
                         + quantityStateRequest.getProductId() + " не найден"));
         log.info("Получили старый product: {}", product);
 
-        if(!product.getQuantityState().equals(quantityStateRequest.getQuantityState())) {
+        if (!product.getQuantityState().equals(quantityStateRequest.getQuantityState())) {
             product.setQuantityState(quantityStateRequest.getQuantityState());
             product = storeRepository.save(product);
             log.info("Product с обновленным QuantityState: {}", product);
