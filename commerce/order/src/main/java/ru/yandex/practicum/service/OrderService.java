@@ -4,9 +4,12 @@ import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface OrderService {
     OrderDto createOrder(String username, CreateNewOrderRequest newOrderRequest);
 
     List<OrderDto> getUserOrders(String username);
+
+    OrderDto payOrder(UUID orderId);
 }
