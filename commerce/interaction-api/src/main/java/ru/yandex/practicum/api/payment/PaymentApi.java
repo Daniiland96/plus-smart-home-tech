@@ -9,4 +9,10 @@ import ru.yandex.practicum.dto.payment.PaymentDto;
 public interface PaymentApi {
     @PostMapping("/api/v1/payment")
     PaymentDto createPaymentOrder(@Valid @RequestBody OrderDto orderDto);
+
+    @PostMapping("/api/v1/payment/productCost")
+    Double calculateProductCost(@Valid @RequestBody OrderDto orderDto);
+
+    @PostMapping("/api/v1/payment/totalCost")
+    Double calculateTotalCost(@Valid @RequestBody OrderDto orderDto);
 }

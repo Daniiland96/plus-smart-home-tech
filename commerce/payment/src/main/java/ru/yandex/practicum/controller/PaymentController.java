@@ -21,4 +21,16 @@ public class PaymentController implements PaymentApi {
         log.info("Запрос на создание оплаты заказа: {}", orderDto);
         return paymentService.createPaymentOrder(orderDto);
     }
+
+    @Override
+    public Double calculateProductCost(OrderDto orderDto) {
+        log.info("Запрос на рассчет стоимости продуктов: {}", orderDto);
+        return paymentService.calculateProductCost(orderDto);
+    }
+
+    @Override
+    public Double calculateTotalCost(OrderDto orderDto) {
+        log.info("Запрос на рассчет полной стоимости заказа: {}", orderDto);
+        return paymentService.calculateTotalCost(orderDto);
+    }
 }

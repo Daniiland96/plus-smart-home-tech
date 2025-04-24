@@ -2,6 +2,7 @@ package ru.yandex.practicum.dto.order;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,9 +38,12 @@ public class OrderDto {
 
     private Boolean fragile;
 
+    @PositiveOrZero
     private Double totalPrice;
 
+    @PositiveOrZero
     private Double deliveryPrice;
 
+    @PositiveOrZero
     private Double productPrice;
 }
