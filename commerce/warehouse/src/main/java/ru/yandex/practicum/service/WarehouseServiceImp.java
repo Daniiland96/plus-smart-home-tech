@@ -7,12 +7,15 @@ import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.dto.warehouse.*;
+import ru.yandex.practicum.exception.NoOrderFoundException;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.feignClient.ShoppingStoreFeignClient;
 import ru.yandex.practicum.mapper.WarehouseMapper;
+import ru.yandex.practicum.model.OrderBooking;
 import ru.yandex.practicum.model.WarehouseProduct;
+import ru.yandex.practicum.repository.OrderBookingRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
 
 import java.security.SecureRandom;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WarehouseServiceImp implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
+    private final OrderBookingRepository bookingRepository;
     private final ShoppingStoreFeignClient storeFeignClient;
     private AddressDto warehouseAddress = settingAddress();
 
@@ -91,7 +95,11 @@ public class WarehouseServiceImp implements WarehouseService {
         List<WarehouseProduct> products = changeQuantityProductsInWarehouse(productsInRequest, warehouseProductsMap);
         setProductQuantityState(products);
 
-        return bookingProducts(productsInRequest, warehouseProductsMap);
+        BookedProductsDto bookedDto = bookingProducts(productsInRequest, warehouseProductsMap);
+        OrderBooking orderBooking = WarehouseMapper.mapToOrderBooking(assemblyRequest, bookedDto);
+        orderBooking = bookingRepository.save(orderBooking);
+        log.info("Сохраняем бронирование в БД: {}", orderBooking);
+        return bookedDto;
     }
 
     @Override
@@ -123,7 +131,15 @@ public class WarehouseServiceImp implements WarehouseService {
         setProductQuantityState(products);
     }
 
-    // Shipped
+    @Override
+    public void shippedProductsToTheWarehouse(ShippedToDeliveryRequest deliveryRequest) {
+        OrderBooking orderBooking = bookingRepository.findById(deliveryRequest.getOrderId()).orElseThrow(() ->
+                new NoOrderFoundException("Не найдено бронирование с указанным id заказа: " + deliveryRequest.getOrderId()));
+        log.info("Старый OrderBooking: {}", orderBooking);
+        orderBooking.setDeliveryId(deliveryRequest.getDeliveryId());
+        orderBooking = bookingRepository.save(orderBooking);
+        log.info("Обновляем OrderBooking в БД: {}", orderBooking);
+    }
 
     private AddressDto settingAddress() {
         String[] addresses = new String[]{"ADDRESS_1", "ADDRESS_2"};
