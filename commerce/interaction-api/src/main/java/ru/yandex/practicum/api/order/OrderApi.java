@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
+import ru.yandex.practicum.dto.order.ProductReturnRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,4 +19,13 @@ public interface OrderApi {
 
     @PostMapping("/api/v1/order/payment")
     OrderDto payOrder(@RequestBody UUID orderId);
+
+    @PostMapping("/api/v1/order/return")
+    OrderDto returnOrder(@Valid @RequestBody ProductReturnRequest returnRequest);
+
+    @PostMapping("/api/v1/order/payment/failed")
+    OrderDto setPaymentFailed(@RequestBody UUID orderId);
+
+    @PostMapping("/api/v1/order/calculate/total")
+    OrderDto calculateTotalCost(@RequestBody UUID orderId);
 }

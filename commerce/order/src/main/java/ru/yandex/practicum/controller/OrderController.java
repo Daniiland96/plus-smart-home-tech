@@ -1,5 +1,6 @@
 package ru.yandex.practicum.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.order.OrderApi;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
+import ru.yandex.practicum.dto.order.ProductReturnRequest;
 import ru.yandex.practicum.service.OrderService;
 
 import java.util.List;
@@ -35,5 +37,23 @@ public class OrderController implements OrderApi {
     public OrderDto payOrder(UUID orderId) {
         log.info("Запрос на оплату заказа: {}", orderId);
         return orderService.payOrder(orderId);
+    }
+
+    @Override
+    public OrderDto returnOrder(ProductReturnRequest returnRequest) {
+        log.info("Запрос на возврат заказа: {}", returnRequest);
+        return orderService.returnOrder(returnRequest);
+    }
+
+    @Override
+    public OrderDto setPaymentFailed(UUID orderId) {
+        log.info("Запрос при неудачной оплате заказа: {}", orderId);
+        return orderService.setPaymentFailed(orderId);
+    }
+
+    @Override
+    public OrderDto calculateTotalCost(UUID orderId) {
+        log.info("Запрос на рассчет полной стоимости заказа: {}", orderId);
+        return orderService.calculateTotalCost(orderId);
     }
 }

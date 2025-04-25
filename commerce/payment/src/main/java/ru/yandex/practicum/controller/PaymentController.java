@@ -10,6 +10,8 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.service.PaymentService;
 
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +34,11 @@ public class PaymentController implements PaymentApi {
     public Double calculateTotalCost(OrderDto orderDto) {
         log.info("Запрос на рассчет полной стоимости заказа: {}", orderDto);
         return paymentService.calculateTotalCost(orderDto);
+    }
+
+    @Override
+    public void setPaymentFailed(UUID paymentId) {
+        log.info("Запрос при неудачной оплате заказа: {}", paymentId);
+        paymentService.setPaymentFailed(paymentId);
     }
 }

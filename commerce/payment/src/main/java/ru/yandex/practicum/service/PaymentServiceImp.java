@@ -8,6 +8,7 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.dto.payment.PaymentState;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
+import ru.yandex.practicum.exception.NoOrderFoundException;
 import ru.yandex.practicum.exception.NotEnoughInfoInOrderToCalculateException;
 import ru.yandex.practicum.feignClient.OrderFeign;
 import ru.yandex.practicum.feignClient.ShoppingStoreFeign;
@@ -69,11 +70,31 @@ public class PaymentServiceImp implements PaymentService {
 
     @Override
     public Double calculateTotalCost(OrderDto orderDto) {
-        if(orderDto.getProductPrice() == null || orderDto.getDeliveryPrice() == null) {
+        if (orderDto.getProductPrice() == null || orderDto.getDeliveryPrice() == null) {
             throw new NotEnoughInfoInOrderToCalculateException("Недостаточно данных для расчета полной стоимости заказа");
         }
         Double totalCost = orderDto.getProductPrice() * 1.1 + orderDto.getDeliveryPrice();
         log.info("Итоговая стоимость заказа: {}", totalCost);
         return totalCost;
+    }
+
+    @Override
+    public void setPaymentFailed(UUID paymentId) {
+        if (paymentId == null) {
+            throw new IllegalArgumentException("Id платежа не может быть null");
+        }
+        PaymentEntity payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new NoOrderFoundException("Не найден платеж с Id: " + paymentId));
+        log.info("Находим нужный платеж: {}", payment);
+        payment.setPaymentState(PaymentState.FAILED);
+
+        try {
+            OrderDto dto = orderFeign.setPaymentFailed(payment.getOrderId());
+            log.info("Обновляем статус заказа: {}", dto);
+        } catch (FeignException e) {
+            throw new NoOrderFoundException(e.getMessage());
+        }
+        payment = paymentRepository.save(payment);
+        log.info("Обновляем статус платежа: {}", payment);
     }
 }
