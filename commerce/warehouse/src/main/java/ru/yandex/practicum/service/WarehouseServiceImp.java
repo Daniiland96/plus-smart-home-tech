@@ -118,7 +118,7 @@ public class WarehouseServiceImp implements WarehouseService {
         for (UUID id : returnedProducts.keySet()) {
             Integer returnedQuantity = returnedProducts.get(id);
             if (returnedQuantity == null || returnedQuantity <= 0) {
-                throw new IllegalArgumentException("Возвращаемое количество товара, должно быть не null и больше ноля");
+                throw new IllegalArgumentException("Возвращаемое количество товара, должно быть не null, меньше или равно нолю");
             }
             WarehouseProduct product = warehouseProductsMap.get(id);
             product.setQuantity(product.getQuantity() + returnedQuantity);

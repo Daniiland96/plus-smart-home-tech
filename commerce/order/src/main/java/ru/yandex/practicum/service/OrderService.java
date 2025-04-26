@@ -19,4 +19,8 @@ public interface OrderService {
     OrderDto setPaymentFailed(UUID orderId);
 
     OrderDto calculateTotalCost(UUID orderId);
+
+    OrderDto assembleOrder(UUID orderId);
+
+    OrderDto assembleOrderFailed(UUID orderId);
 }

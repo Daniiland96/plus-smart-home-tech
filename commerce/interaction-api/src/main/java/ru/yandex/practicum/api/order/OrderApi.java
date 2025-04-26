@@ -28,4 +28,10 @@ public interface OrderApi {
 
     @PostMapping("/api/v1/order/calculate/total")
     OrderDto calculateTotalCost(@RequestBody UUID orderId);
+
+    @PostMapping("/api/v1/order/assembly")
+    OrderDto assembleOrder(@RequestBody UUID orderId);
+
+    @PostMapping("/api/v1/order/assembly/failed")
+    OrderDto assembleOrderFailed(@RequestBody UUID orderId);
 }

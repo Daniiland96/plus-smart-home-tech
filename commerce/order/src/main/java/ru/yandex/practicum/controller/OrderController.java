@@ -56,4 +56,16 @@ public class OrderController implements OrderApi {
         log.info("Запрос на рассчет полной стоимости заказа: {}", orderId);
         return orderService.calculateTotalCost(orderId);
     }
+
+    @Override
+    public OrderDto assembleOrder(UUID orderId) {
+        log.info("Запрос на сбор заказа на складе: {}", orderId);
+        return orderService.assembleOrder(orderId);
+    }
+
+    @Override
+    public OrderDto assembleOrderFailed(UUID orderId) {
+        log.info("Запрос при неудачной сборке заказа на складе: {}", orderId);
+        return orderService.assembleOrderFailed(orderId);
+    }
 }

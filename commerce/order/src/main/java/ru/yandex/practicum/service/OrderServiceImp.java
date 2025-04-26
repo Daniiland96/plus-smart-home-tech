@@ -8,6 +8,7 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.OrderState;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
 import ru.yandex.practicum.dto.payment.PaymentDto;
+import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.NoOrderFoundException;
 import ru.yandex.practicum.exception.NotAssembledOrderException;
@@ -30,6 +31,7 @@ public class OrderServiceImp implements OrderService {
     private final WarehouseFeignClient warehouseFeign;
     private final PaymentFeign paymentFeign;
 
+    // Создаем заказ, считаем стоимость продуктов и создаем доставку
     @Override
     public OrderDto createOrder(String username, CreateNewOrderRequest newOrderRequest) {
         if (newOrderRequest == null) {
@@ -62,14 +64,10 @@ public class OrderServiceImp implements OrderService {
         return OrderMapper.mapToOrderDto(orders);
     }
 
+    // Получаем сообщение об успешной оплате
     @Override
     public OrderDto payOrder(UUID orderId) {
-        if (orderId == null) {
-            throw new IllegalArgumentException("orderId не должен быть null");
-        }
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoOrderFoundException("Не найден заказ с id: " + orderId));
-        log.info("Получаем заказ из БД: {}", order);
+        Order order = findOrderById(orderId);
         if (!(order.getState().equals(OrderState.ASSEMBLED) || order.getState().equals(OrderState.PAYMENT_FAILED))) {
             throw new NotAssembledOrderException("Заказа еще не собран на складе");
         }
@@ -88,8 +86,7 @@ public class OrderServiceImp implements OrderService {
         if (returnRequest.getProducts().isEmpty()) {
             throw new IllegalArgumentException("Список возвращаемых продуктов не должен быть пустым");
         }
-        Order order = orderRepository.findById(returnRequest.getOrderId())
-                .orElseThrow(() -> new NoOrderFoundException("Не найден заказ с id: " + returnRequest.getOrderId()));
+        Order order = findOrderById(returnRequest.getOrderId());
         order.setState(OrderState.PRODUCT_RETURNED);
         order = orderRepository.save(order);
         log.info("Обновляем статус заказа в БД: {}", order);
@@ -101,8 +98,7 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public OrderDto setPaymentFailed(UUID orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoOrderFoundException("Не найден заказ с id: " + orderId));
+        Order order = findOrderById(orderId);
         order.setState(OrderState.PAYMENT_FAILED);
         order = orderRepository.save(order);
         log.info("Обновляем статус заказа в БД: {}", order);
@@ -111,9 +107,7 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public OrderDto calculateTotalCost(UUID orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoOrderFoundException("Не найден заказ с id: " + orderId));
-        log.info("Находим нужный заказ: {}", order);
+        Order order = findOrderById(orderId);
         if (order.getDeliveryPrice() == null || order.getProductPrice() == null) {
             throw new NotEnoughInfoInOrderToCalculateException("Недостаточно данных для рассчета полной стоимости заказа");
         }
@@ -123,6 +117,38 @@ public class OrderServiceImp implements OrderService {
         order = orderRepository.save(order);
         log.info("Обновляем заказ в БД: {}", order);
         return OrderMapper.mapToOrderDto(order);
-        надо проверить
+    }
+
+    // Бронируем заказ на складе и инициализируем оплату (Как в ТЗ)
+    @Override
+    public OrderDto assembleOrder(UUID orderId) {
+        Order order = findOrderById(orderId);
+        AssemblyProductsForOrderRequest assemblyRequest = new AssemblyProductsForOrderRequest(orderId, order.getProducts());
+        log.info("Запрос на сборку для склада: {}", assemblyRequest);
+        BookedProductsDto bookedDto = warehouseFeign.assemblingProductsForTheOrder(assemblyRequest);
+        log.info("Ответ склада по сборке: {}", bookedDto);
+        order.setState(OrderState.ASSEMBLED);
+        order = orderRepository.save(order);
+        log.info("Обновляем заказ в БД: {}", order);
+        return OrderMapper.mapToOrderDto(order);
+    }
+
+    @Override
+    public OrderDto assembleOrderFailed(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.ASSEMBLY_FAILED);
+        order = orderRepository.save(order);
+        log.info("Обновляем заказ в БД: {}", order);
+        return OrderMapper.mapToOrderDto(order);
+    }
+
+    private Order findOrderById(UUID orderId) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("orderId не должен быть null");
+        }
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NoOrderFoundException("Не найден заказ с id: " + orderId));
+        log.info("Находим нужный заказ: {}", order);
+        return order;
     }
 }
