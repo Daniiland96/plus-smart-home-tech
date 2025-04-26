@@ -64,20 +64,17 @@ public class OrderServiceImp implements OrderService {
         return OrderMapper.mapToOrderDto(orders);
     }
 
-    // Получаем сообщение об успешной оплате
     @Override
-    public OrderDto payOrder(UUID orderId) {
+    public OrderDto calculateTotalCost(UUID orderId) {
         Order order = findOrderById(orderId);
-        if (!(order.getState().equals(OrderState.ASSEMBLED) || order.getState().equals(OrderState.PAYMENT_FAILED))) {
-            throw new NotAssembledOrderException("Заказа еще не собран на складе");
+        if (order.getDeliveryPrice() == null || order.getProductPrice() == null) {
+            throw new NotEnoughInfoInOrderToCalculateException("Недостаточно данных для рассчета полной стоимости заказа");
         }
-
-        PaymentDto paymentDto = paymentFeign.createPaymentOrder(OrderMapper.mapToOrderDto(order));
-        log.info("Создали платеж в платежном сервисе: {}", paymentDto);
-        order.setState(OrderState.ON_PAYMENT);
-        order.setPaymentId(paymentDto.getPaymentId());
+        Double totalCost = paymentFeign.calculateTotalCost(OrderMapper.mapToOrderDto(order));
+        log.info("Полная стоимость заказа: {}", totalCost);
+        order.setTotalPrice(totalCost);
         order = orderRepository.save(order);
-        log.info("Обновляем статус заказа в БД: {}", order);
+        log.info("Обновляем заказ в БД: {}", order);
         return OrderMapper.mapToOrderDto(order);
     }
 
@@ -97,25 +94,20 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
-    public OrderDto setPaymentFailed(UUID orderId) {
+    public OrderDto payOrder(UUID orderId) {
         Order order = findOrderById(orderId);
-        order.setState(OrderState.PAYMENT_FAILED);
+        order.setState(OrderState.PAID);
         order = orderRepository.save(order);
         log.info("Обновляем статус заказа в БД: {}", order);
         return OrderMapper.mapToOrderDto(order);
     }
 
     @Override
-    public OrderDto calculateTotalCost(UUID orderId) {
+    public OrderDto setPaymentFailed(UUID orderId) {
         Order order = findOrderById(orderId);
-        if (order.getDeliveryPrice() == null || order.getProductPrice() == null) {
-            throw new NotEnoughInfoInOrderToCalculateException("Недостаточно данных для рассчета полной стоимости заказа");
-        }
-        Double totalCost = paymentFeign.calculateTotalCost(OrderMapper.mapToOrderDto(order));
-        log.info("Полная стоимость заказа: {}", totalCost);
-        order.setTotalPrice(totalCost);
+        order.setState(OrderState.PAYMENT_FAILED);
         order = orderRepository.save(order);
-        log.info("Обновляем заказ в БД: {}", order);
+        log.info("Обновляем статус заказа в БД: {}", order);
         return OrderMapper.mapToOrderDto(order);
     }
 
@@ -130,6 +122,9 @@ public class OrderServiceImp implements OrderService {
         order.setState(OrderState.ASSEMBLED);
         order = orderRepository.save(order);
         log.info("Обновляем заказ в БД: {}", order);
+
+        order = createPaymentOrder(order);
+
         return OrderMapper.mapToOrderDto(order);
     }
 
@@ -149,6 +144,20 @@ public class OrderServiceImp implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NoOrderFoundException("Не найден заказ с id: " + orderId));
         log.info("Находим нужный заказ: {}", order);
+        return order;
+    }
+
+    private Order createPaymentOrder(Order order) {
+        if (!(order.getState().equals(OrderState.ASSEMBLED) || order.getState().equals(OrderState.PAYMENT_FAILED))) {
+            throw new NotAssembledOrderException("Заказа еще не собран на складе");
+        }
+
+        PaymentDto paymentDto = paymentFeign.createPaymentOrder(OrderMapper.mapToOrderDto(order));
+        log.info("Создали платеж в платежном сервисе: {}", paymentDto);
+        order.setState(OrderState.ON_PAYMENT);
+        order.setPaymentId(paymentDto.getPaymentId());
+        order = orderRepository.save(order);
+        log.info("Обновляем статус заказа в БД: {}", order);
         return order;
     }
 }
