@@ -3,17 +3,21 @@ package ru.yandex.practicum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.delivery.DeliveryState;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.OrderState;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
 import ru.yandex.practicum.dto.payment.PaymentDto;
+import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.NoOrderFoundException;
 import ru.yandex.practicum.exception.NotAssembledOrderException;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
 import ru.yandex.practicum.exception.NotEnoughInfoInOrderToCalculateException;
+import ru.yandex.practicum.feignClient.DeliveryFeign;
 import ru.yandex.practicum.feignClient.PaymentFeign;
 import ru.yandex.practicum.feignClient.WarehouseFeignClient;
 import ru.yandex.practicum.mapper.OrderMapper;
@@ -30,8 +34,8 @@ public class OrderServiceImp implements OrderService {
     private final OrderRepository orderRepository;
     private final WarehouseFeignClient warehouseFeign;
     private final PaymentFeign paymentFeign;
-
-    // Создаем заказ, считаем стоимость продуктов и создаем доставку
+    private final DeliveryFeign deliveryFeign;
+    
     @Override
     public OrderDto createOrder(String username, CreateNewOrderRequest newOrderRequest) {
         if (newOrderRequest == null) {
@@ -47,9 +51,13 @@ public class OrderServiceImp implements OrderService {
         Double productCost = paymentFeign.calculateProductCost(OrderMapper.mapToOrderDto(order));
         log.info("Стоимость продуктов в заказе: {}", productCost);
         order.setProductPrice(productCost);
-
         order = orderRepository.save(order);
         log.info("Сохранили заказ в БД: {}", order);
+
+        DeliveryDto deliveryDto = createDeliveryOrder(order.getOrderId(), newOrderRequest.getDeliveryAddress());
+        order.setDeliveryId(deliveryDto.getDeliveryId());
+        order = orderRepository.save(order);
+        log.info("Добавляем в заказ deliveryId: {}", order);
         return OrderMapper.mapToOrderDto(order);
     }
 
@@ -159,5 +167,17 @@ public class OrderServiceImp implements OrderService {
         order = orderRepository.save(order);
         log.info("Обновляем статус заказа в БД: {}", order);
         return order;
+    }
+
+    private DeliveryDto createDeliveryOrder(UUID orderId, AddressDto toAddressDelivery) {
+        DeliveryDto dto = new DeliveryDto();
+        AddressDto fromAddressDelivery = warehouseFeign.getAddressWarehouse();
+        dto.setFromAddress(fromAddressDelivery);
+        dto.setToAddress(toAddressDelivery);
+        dto.setOrderId(orderId);
+        dto.setDeliveryState(DeliveryState.CREATED);
+        dto = deliveryFeign.createDelivery(dto);
+        log.info("Создаем доставку заказа в сервисе заказа: {}", dto);
+        return dto;
     }
 }

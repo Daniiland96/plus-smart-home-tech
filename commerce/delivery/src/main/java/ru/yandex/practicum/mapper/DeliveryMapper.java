@@ -19,6 +19,17 @@ public class DeliveryMapper {
         return delivery;
     }
 
+    public static DeliveryDto mapToDeliveryDto(Delivery delivery) {
+        DeliveryDto dto = new DeliveryDto();
+        dto.setDeliveryId(delivery.getDeliveryId());
+        dto.setFromAddress(mapToAddressDto(delivery.getFromAddress()));
+        dto.setToAddress(mapToAddressDto(delivery.getToAddress()));
+        dto.setOrderId(delivery.getOrderId());
+        dto.setDeliveryState(delivery.getDeliveryState());
+        log.info("Результат маппинга в DeliveryDto: {}", dto);
+        return dto;
+    }
+
     public static Address mapToAddress(AddressDto dto) {
         Address address = new Address();
         address.setCountry(dto.getCountry());

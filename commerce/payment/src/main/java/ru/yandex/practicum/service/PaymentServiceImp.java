@@ -97,4 +97,24 @@ public class PaymentServiceImp implements PaymentService {
         payment = paymentRepository.save(payment);
         log.info("Обновляем статус платежа: {}", payment);
     }
+
+    @Override
+    public void payOrder(UUID paymentId) {
+        if (paymentId == null) {
+            throw new IllegalArgumentException("Id платежа не может быть null");
+        }
+        PaymentEntity payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new NoOrderFoundException("Не найден платеж с Id: " + paymentId));
+        log.info("Находим нужный платеж: {}", payment);
+        payment.setPaymentState(PaymentState.SUCCESS);
+
+        try {
+            OrderDto dto = orderFeign.payOrder(payment.getOrderId());
+            log.info("Обновляем статус заказа: {}", dto);
+        } catch (FeignException e) {
+            throw new NoOrderFoundException(e.getMessage());
+        }
+        payment = paymentRepository.save(payment);
+        log.info("Обновляем статус платежа: {}", payment);
+    }
 }

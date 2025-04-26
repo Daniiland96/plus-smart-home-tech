@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @ToString
 public class DeliveryDto {
-    @NotNull
+
     private UUID deliveryId;
 
     @NotNull
@@ -24,6 +24,5 @@ public class DeliveryDto {
     @NotNull
     private UUID orderId;
 
-    @NotNull
     private DeliveryState deliveryState;
 }
