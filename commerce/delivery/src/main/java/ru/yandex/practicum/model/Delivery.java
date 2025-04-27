@@ -19,14 +19,6 @@ public class Delivery {
     @Column(name = "delivery_id", updatable = false, nullable = false)
     private UUID deliveryId;
 
-    @Column(name = "delivery_volume")
-    private Double deliveryVolume;
-
-    @Column(name = "delivery_weight")
-    private Double deliveryWeight;
-
-    private Boolean fragile;
-
     @ManyToOne
     @JoinColumn(name = "from_address_id")
     private Address fromAddress;

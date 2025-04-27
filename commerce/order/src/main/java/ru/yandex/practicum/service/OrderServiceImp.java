@@ -48,11 +48,12 @@ public class OrderServiceImp implements OrderService {
         log.info("Проверка товара на складе: {}", bookedProductsDto);
 
         Order order = OrderMapper.mapToOrder(username, newOrderRequest, bookedProductsDto);
+        order = orderRepository.save(order);
+        log.info("Сохранили заказ в БД: {}", order);
+
         Double productCost = paymentFeign.calculateProductCost(OrderMapper.mapToOrderDto(order));
         log.info("Стоимость продуктов в заказе: {}", productCost);
         order.setProductPrice(productCost);
-        order = orderRepository.save(order);
-        log.info("Сохранили заказ в БД: {}", order);
 
         DeliveryDto deliveryDto = createDeliveryOrder(order.getOrderId(), newOrderRequest.getDeliveryAddress());
         order.setDeliveryId(deliveryDto.getDeliveryId());
@@ -81,6 +82,16 @@ public class OrderServiceImp implements OrderService {
         Double totalCost = paymentFeign.calculateTotalCost(OrderMapper.mapToOrderDto(order));
         log.info("Полная стоимость заказа: {}", totalCost);
         order.setTotalPrice(totalCost);
+        order = orderRepository.save(order);
+        log.info("Обновляем заказ в БД: {}", order);
+        return OrderMapper.mapToOrderDto(order);
+    }
+
+    @Override
+    public OrderDto calculateDelivery(UUID orderId) {
+        Order order = findOrderById(orderId);
+        Double cost = deliveryFeign.calculateDelivery(OrderMapper.mapToOrderDto(order));
+        order.setDeliveryPrice(cost);
         order = orderRepository.save(order);
         log.info("Обновляем заказ в БД: {}", order);
         return OrderMapper.mapToOrderDto(order);
@@ -156,10 +167,12 @@ public class OrderServiceImp implements OrderService {
     }
 
     private Order createPaymentOrder(Order order) {
-        if (!(order.getState().equals(OrderState.ASSEMBLED) || order.getState().equals(OrderState.PAYMENT_FAILED))) {
+        if (!(order.getState().equals(OrderState.ASSEMBLED))) {
             throw new NotAssembledOrderException("Заказа еще не собран на складе");
         }
-
+        if (order.getTotalPrice() == null || order.getDeliveryPrice() == null || order.getProductPrice() == null) {
+            throw new NotEnoughInfoInOrderToCalculateException("Недостаточно данных для оплаты заказа");
+        }
         PaymentDto paymentDto = paymentFeign.createPaymentOrder(OrderMapper.mapToOrderDto(order));
         log.info("Создали платеж в платежном сервисе: {}", paymentDto);
         order.setState(OrderState.ON_PAYMENT);

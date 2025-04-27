@@ -58,6 +58,12 @@ public class OrderController implements OrderApi {
     }
 
     @Override
+    public OrderDto calculateDelivery(UUID orderId) {
+        log.info("Запрос на рассчет стоимости доставки: {}", orderId);
+        return orderService.calculateDelivery(orderId);
+    }
+
+    @Override
     public OrderDto assembleOrder(UUID orderId) {
         log.info("Запрос на сбор заказа на складе: {}", orderId);
         return orderService.assembleOrder(orderId);

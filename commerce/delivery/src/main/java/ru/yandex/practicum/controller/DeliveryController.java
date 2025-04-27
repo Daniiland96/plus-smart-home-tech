@@ -1,11 +1,13 @@
 package ru.yandex.practicum.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.delivery.DeliveryApi;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.service.DeliveryService;
 
 @Slf4j
@@ -18,5 +20,11 @@ public class DeliveryController implements DeliveryApi {
     public DeliveryDto createDelivery(DeliveryDto deliveryDto) {
         log.info("Запрос на создание доставки: {}", deliveryDto);
         return deliveryService.createDelivery(deliveryDto);
+    }
+
+    @Override
+    public Double calculateDelivery(OrderDto orderDto) {
+        log.info("Запрос на расчет стоимости доставки: {}", orderDto);
+        return deliveryService.calculateDelivery(orderDto);
     }
 }
