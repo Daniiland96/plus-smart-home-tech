@@ -25,4 +25,10 @@ public interface OrderService {
     OrderDto assembleOrderFailed(UUID orderId);
 
     OrderDto calculateDelivery(UUID orderId);
+
+    OrderDto deliveryOrder(UUID orderId);
+
+    OrderDto deliveryOrderFailed(UUID orderId);
+
+    OrderDto completedOrder(UUID orderId);
 }

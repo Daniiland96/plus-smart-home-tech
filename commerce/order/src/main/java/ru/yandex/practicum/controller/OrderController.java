@@ -3,6 +3,7 @@ package ru.yandex.practicum.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,5 +74,23 @@ public class OrderController implements OrderApi {
     public OrderDto assembleOrderFailed(UUID orderId) {
         log.info("Запрос при неудачной сборке заказа на складе: {}", orderId);
         return orderService.assembleOrderFailed(orderId);
+    }
+
+    @Override
+    public OrderDto deliveryOrder(UUID orderId){
+        log.info("Запрос при удачной доставке заказа: {}", orderId);
+        return orderService.deliveryOrder(orderId);
+    }
+
+    @Override
+    public OrderDto deliveryOrderFailed(UUID orderId) {
+        log.info("Запрос при неудачной доставке заказа: {}", orderId);
+        return orderService.deliveryOrderFailed(orderId);
+    }
+
+    @Override
+    public OrderDto completedOrder(UUID orderId) {
+        log.info("Запрос на завершение заказа: {}", orderId);
+        return orderService.completedOrder(orderId);
     }
 }

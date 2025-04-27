@@ -89,6 +89,21 @@ public class DeliveryServiceImp implements DeliveryService {
         return cost;
     }
 
+    @Override
+    public void setDeliverySuccessful(UUID deliveryId) {
+        sefsef
+    }
+
+    @Override
+    public void setDeliveryFailed(UUID deliveryId) {
+        sefsf
+    }
+
+    @Override
+    public void pickOrderForDelivery(UUID deliveryId) {
+        sefsef
+    }
+
     private Address findOrCreateAddress(Address address) {
         Optional<Address> addressOpt = addressRepository.findByCountryAndCityAndStreetAndHouseAndFlat(
                 address.getCountry(), address.getCity(), address.getStreet(), address.getHouse(), address.getFlat());

@@ -130,6 +130,33 @@ public class OrderServiceImp implements OrderService {
         return OrderMapper.mapToOrderDto(order);
     }
 
+    @Override
+    public OrderDto deliveryOrder(UUID orderId){
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.DELIVERED);
+        order = orderRepository.save(order);
+        log.info("Обновляем статус заказа в БД: {}", order);
+        return OrderMapper.mapToOrderDto(order);
+    }
+
+    @Override
+    public OrderDto deliveryOrderFailed(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.DELIVERY_FAILED);
+        order = orderRepository.save(order);
+        log.info("Обновляем статус заказа в БД: {}", order);
+        return OrderMapper.mapToOrderDto(order);
+    }
+
+    @Override
+    public OrderDto completedOrder(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.COMPLETED);
+        order = orderRepository.save(order);
+        log.info("Обновляем статус заказа в БД: {}", order);
+        return OrderMapper.mapToOrderDto(order);
+    }
+
     // Бронируем заказ на складе и инициализируем оплату (Как в ТЗ)
     @Override
     public OrderDto assembleOrder(UUID orderId) {
