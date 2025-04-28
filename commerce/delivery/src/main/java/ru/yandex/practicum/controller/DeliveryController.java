@@ -1,10 +1,7 @@
 package ru.yandex.practicum.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.delivery.DeliveryApi;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
@@ -32,13 +29,13 @@ public class DeliveryController implements DeliveryApi {
     }
 
     @Override
-    public void setDeliverySuccessful(UUID deliveryId){
+    public void setDeliverySuccessful(UUID deliveryId) {
         log.info("Запрос при удачной доставки: {}", deliveryId);
         deliveryService.setDeliverySuccessful(deliveryId);
     }
 
     @Override
-    public void setDeliveryFailed(UUID deliveryId){
+    public void setDeliveryFailed(UUID deliveryId) {
         log.info("Запрос при неудачной доставки: {}", deliveryId);
         deliveryService.setDeliveryFailed(deliveryId);
     }

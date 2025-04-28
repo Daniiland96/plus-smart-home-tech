@@ -1,11 +1,7 @@
 package ru.yandex.practicum.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.order.OrderApi;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
@@ -77,7 +73,7 @@ public class OrderController implements OrderApi {
     }
 
     @Override
-    public OrderDto deliveryOrder(UUID orderId){
+    public OrderDto deliveryOrder(UUID orderId) {
         log.info("Запрос при удачной доставке заказа: {}", orderId);
         return orderService.deliveryOrder(orderId);
     }

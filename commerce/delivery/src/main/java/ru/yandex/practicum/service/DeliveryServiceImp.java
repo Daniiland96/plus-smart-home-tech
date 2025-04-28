@@ -1,12 +1,15 @@
 package ru.yandex.practicum.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.delivery.DeliveryState;
 import ru.yandex.practicum.dto.order.OrderDto;
+import ru.yandex.practicum.dto.warehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.exception.NoDeliveryFoundException;
+import ru.yandex.practicum.exception.NoOrderFoundException;
 import ru.yandex.practicum.exception.NotEnoughInfoInOrderToCalculateException;
 import ru.yandex.practicum.feignClient.OrderFeignClient;
 import ru.yandex.practicum.feignClient.WarehouseFeignClient;
@@ -91,17 +94,50 @@ public class DeliveryServiceImp implements DeliveryService {
 
     @Override
     public void setDeliverySuccessful(UUID deliveryId) {
-        sefsef
+        Delivery delivery = findDeliveryById(deliveryId);
+        try {
+            OrderDto orderDto = orderFeign.deliveryOrder(delivery.getOrderId());
+            log.info("Обновляем статус в сервисе заказов: {}", orderDto);
+        } catch (FeignException e) {
+            log.info("Сбой при обновлении статуса в сервисе заказов: {}", e.getMessage());
+            throw new NoOrderFoundException(e.getMessage());
+        }
+        delivery.setDeliveryState(DeliveryState.DELIVERED);
+        delivery = deliveryRepository.save(delivery);
+        log.info("Обновляем доставку в БД: {}", delivery);
     }
 
     @Override
     public void setDeliveryFailed(UUID deliveryId) {
-        sefsf
+        Delivery delivery = findDeliveryById(deliveryId);
+        try {
+            OrderDto orderDto = orderFeign.deliveryOrderFailed(delivery.getOrderId());
+            log.info("Обновляем статус в сервисе заказов: {}", orderDto);
+        } catch (FeignException e) {
+            log.info("Сбой при обновлении статуса в сервисе заказов: {}", e.getMessage());
+            throw new NoOrderFoundException(e.getMessage());
+        }
+        delivery.setDeliveryState(DeliveryState.FAILED);
+        delivery = deliveryRepository.save(delivery);
+        log.info("Обновляем доставку в БД: {}", delivery);
     }
 
     @Override
     public void pickOrderForDelivery(UUID deliveryId) {
-        sefsef
+        Delivery delivery = findDeliveryById(deliveryId);
+        ShippedToDeliveryRequest shippedRequest = new ShippedToDeliveryRequest();
+        shippedRequest.setDeliveryId(deliveryId);
+        shippedRequest.setOrderId(delivery.getOrderId());
+        try {
+            warehouseFeign.shippedProductsToTheWarehouse(shippedRequest);
+            log.info("Обновляем статус на складе и передаем заказ в доставку: {}", shippedRequest);
+        } catch (FeignException e) {
+            log.info("Сбой при обновлении статуса в сервисе склада: {}", e.getMessage());
+            throw new NoOrderFoundException(e.getMessage());
+        }
+        delivery.setDeliveryState(DeliveryState.IN_PROGRESS);
+        delivery = deliveryRepository.save(delivery);
+        log.info("Обновляем доставку в БД: {}", delivery);
     }
 
     private Address findOrCreateAddress(Address address) {

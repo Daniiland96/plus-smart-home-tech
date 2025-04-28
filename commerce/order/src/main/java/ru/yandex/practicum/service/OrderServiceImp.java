@@ -35,7 +35,7 @@ public class OrderServiceImp implements OrderService {
     private final WarehouseFeignClient warehouseFeign;
     private final PaymentFeign paymentFeign;
     private final DeliveryFeign deliveryFeign;
-    
+
     @Override
     public OrderDto createOrder(String username, CreateNewOrderRequest newOrderRequest) {
         if (newOrderRequest == null) {
@@ -131,7 +131,7 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
-    public OrderDto deliveryOrder(UUID orderId){
+    public OrderDto deliveryOrder(UUID orderId) {
         Order order = findOrderById(orderId);
         order.setState(OrderState.DELIVERED);
         order = orderRepository.save(order);

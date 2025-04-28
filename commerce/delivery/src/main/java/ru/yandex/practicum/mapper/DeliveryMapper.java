@@ -41,7 +41,7 @@ public class DeliveryMapper {
         return address;
     }
 
-    public static AddressDto mapToAddressDto (Address address) {
+    public static AddressDto mapToAddressDto(Address address) {
         AddressDto dto = new AddressDto();
         dto.setCountry(address.getCountry());
         dto.setCity(address.getCity());
