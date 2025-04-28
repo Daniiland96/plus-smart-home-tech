@@ -7,10 +7,7 @@ import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.dto.warehouse.*;
-import ru.yandex.practicum.exception.NoOrderFoundException;
-import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
-import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
-import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.exception.*;
 import ru.yandex.practicum.feignClient.OrderFeignClient;
 import ru.yandex.practicum.feignClient.ShoppingStoreFeignClient;
 import ru.yandex.practicum.mapper.WarehouseMapper;
@@ -166,7 +163,7 @@ public class WarehouseServiceImp implements WarehouseService {
         products.removeAll(productsInWarehouse);
         log.info("Продукты которых нет на складе: {}", products);
         if (!products.isEmpty()) {
-            throw new NoSpecifiedProductInWarehouseException("На складе нет продуктов со следующими id: " + products);
+            throw new ProductInShoppingCartNotInWarehouse("На складе нет продуктов со следующими id: " + products);
         }
     }
 
