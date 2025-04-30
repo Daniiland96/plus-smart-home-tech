@@ -32,6 +32,13 @@ public class DeliveryServiceImp implements DeliveryService {
     private final OrderFeignClient orderFeign;
     private final WarehouseFeignClient warehouseFeign;
 
+    private static final Double BASE_COST = 5.0;
+    private static final Double WAREHOUSE_ADDRESS_2_SURCHARGE = 2.0;
+    private static final Double FRAGILE_SURCHARGE = 0.2;
+    private static final Double WEIGHT_SURCHARGE = 0.3;
+    private static final Double VOLUME_SURCHARGE = 0.2;
+    private static final Double ADDRESS_DELIVERY_SURCHARGE = 0.2;
+
     @Override
     public DeliveryDto createDelivery(DeliveryDto deliveryDto) {
         Delivery delivery = DeliveryMapper.mapToDelivery(deliveryDto);
@@ -66,27 +73,27 @@ public class DeliveryServiceImp implements DeliveryService {
         Delivery delivery = findDeliveryById(orderDto.getDeliveryId());
         Address fromAddress = delivery.getFromAddress();
         Address toAddress = delivery.getToAddress();
-        Double cost = 5.0;
+        Double cost = BASE_COST;
 
         switch (fromAddress.getCity()) {
             case "ADDRESS_1":
                 cost += cost;
                 break;
             case "ADDRESS_2":
-                cost += cost * 2;
+                cost += cost * WAREHOUSE_ADDRESS_2_SURCHARGE;
                 break;
             default:
                 break;
         }
         if (orderDto.getFragile()) {
-            cost += cost * 0.2;
+            cost += cost * FRAGILE_SURCHARGE;
         }
-        cost += orderDto.getDeliveryWeight() * 0.3;
-        cost += orderDto.getDeliveryVolume() * 0.2;
+        cost += orderDto.getDeliveryWeight() * WEIGHT_SURCHARGE;
+        cost += orderDto.getDeliveryVolume() * VOLUME_SURCHARGE;
         if (!(fromAddress.getCountry().equals(toAddress.getCountry())
                 && fromAddress.getCity().equals(toAddress.getCity())
                 && fromAddress.getStreet().equals(toAddress.getStreet()))) {
-            cost += cost * 0.2;
+            cost += cost * ADDRESS_DELIVERY_SURCHARGE;
         }
         log.info("Стоимость доставки: {}", cost);
         return cost;
@@ -129,7 +136,7 @@ public class DeliveryServiceImp implements DeliveryService {
         shippedRequest.setDeliveryId(deliveryId);
         shippedRequest.setOrderId(delivery.getOrderId());
         try {
-            warehouseFeign.shippedProductsToTheWarehouse(shippedRequest);
+            warehouseFeign.shippedProductsToWarehouse(shippedRequest);
             log.info("Обновляем статус на складе и передаем заказ в доставку: {}", shippedRequest);
         } catch (FeignException e) {
             log.info("Сбой при обновлении статуса в сервисе склада: {}", e.getMessage());

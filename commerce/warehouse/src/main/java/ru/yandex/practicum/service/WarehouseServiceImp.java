@@ -51,8 +51,8 @@ public class WarehouseServiceImp implements WarehouseService {
                 .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
         log.info("Создаем Map из продуктов имеющиеся на складе: {}", warehouseProductsMap);
 
-        checkAvailabilityProductsInWarehouse(productsInCart.keySet(), warehouseProductsMap.keySet()); // проверка наличия продуктов на складе
-        checkQuantity(productsInCart, warehouseProductsMap); // проверка количества продуктов на складе
+        checkAvailabilityProductsInWarehouse(productsInCart.keySet(), warehouseProductsMap.keySet());
+        checkQuantity(productsInCart, warehouseProductsMap);
 
         return bookingProducts(productsInCart, warehouseProductsMap);
     }
@@ -75,7 +75,7 @@ public class WarehouseServiceImp implements WarehouseService {
     }
 
     @Override
-    public BookedProductsDto assemblingProductsForTheOrder(AssemblyProductsForOrderRequest assemblyRequest) {
+    public BookedProductsDto assemblingProductsForOrder(AssemblyProductsForOrderRequest assemblyRequest) {
         if (assemblyRequest == null) {
             throw new IllegalArgumentException("AssemblyProductsForOrderRequest не должен быть null");
         }
@@ -89,8 +89,8 @@ public class WarehouseServiceImp implements WarehouseService {
         log.info("Создаем Map из продуктов имеющиеся на складе: {}", warehouseProductsMap);
 
         try {
-            checkAvailabilityProductsInWarehouse(productsInRequest.keySet(), warehouseProductsMap.keySet()); // проверка наличия продуктов на складе
-            checkQuantity(productsInRequest, warehouseProductsMap); // проверка количества продуктов на складе
+            checkAvailabilityProductsInWarehouse(productsInRequest.keySet(), warehouseProductsMap.keySet());
+            checkQuantity(productsInRequest, warehouseProductsMap);
         } catch (NoSpecifiedProductInWarehouseException | ProductInShoppingCartLowQuantityInWarehouse e) {
             orderFeignClient.assembleOrderFailed(assemblyRequest.getOrderId());
             throw e;
@@ -107,7 +107,7 @@ public class WarehouseServiceImp implements WarehouseService {
     }
 
     @Override
-    public void returnProductsToTheWarehouse(Map<UUID, Integer> returnedProducts) {
+    public void returnProductsToWarehouse(Map<UUID, Integer> returnedProducts) {
         if (returnedProducts == null || returnedProducts.isEmpty()) {
             throw new IllegalArgumentException("Маппа товаров на возврат не должна быть null или пустой");
         }
@@ -136,7 +136,7 @@ public class WarehouseServiceImp implements WarehouseService {
     }
 
     @Override
-    public void shippedProductsToTheWarehouse(ShippedToDeliveryRequest deliveryRequest) {
+    public void shippedProductsToWarehouse(ShippedToDeliveryRequest deliveryRequest) {
         OrderBooking orderBooking = bookingRepository.findById(deliveryRequest.getOrderId()).orElseThrow(() ->
                 new NoOrderFoundException("Не найдено бронирование с указанным id заказа: " + deliveryRequest.getOrderId()));
         log.info("Старый OrderBooking: {}", orderBooking);

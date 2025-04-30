@@ -107,7 +107,7 @@ public class OrderServiceImp implements OrderService {
         order = orderRepository.save(order);
         log.info("Обновляем статус заказа в БД: {}", order);
 
-        warehouseFeign.returnProductsToTheWarehouse(returnRequest.getProducts());
+        warehouseFeign.returnProductsToWarehouse(returnRequest.getProducts());
         log.info("Возвращаем продукты на склад");
         return OrderMapper.mapToOrderDto(order);
     }
@@ -163,7 +163,7 @@ public class OrderServiceImp implements OrderService {
         Order order = findOrderById(orderId);
         AssemblyProductsForOrderRequest assemblyRequest = new AssemblyProductsForOrderRequest(orderId, order.getProducts());
         log.info("Запрос на сборку для склада: {}", assemblyRequest);
-        BookedProductsDto bookedDto = warehouseFeign.assemblingProductsForTheOrder(assemblyRequest);
+        BookedProductsDto bookedDto = warehouseFeign.assemblingProductsForOrder(assemblyRequest);
         log.info("Ответ склада по сборке: {}", bookedDto);
         order.setState(OrderState.ASSEMBLED);
         order = orderRepository.save(order);

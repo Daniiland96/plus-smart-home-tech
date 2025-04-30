@@ -15,9 +15,9 @@ public interface WarehouseService {
 
     AddressDto getAddressWarehouse();
 
-    BookedProductsDto assemblingProductsForTheOrder(AssemblyProductsForOrderRequest assemblyRequest);
+    BookedProductsDto assemblingProductsForOrder(AssemblyProductsForOrderRequest assemblyRequest);
 
-    void returnProductsToTheWarehouse(Map<UUID, Integer> returnedProducts);
+    void returnProductsToWarehouse(Map<UUID, Integer> returnedProducts);
 
-    void shippedProductsToTheWarehouse(ShippedToDeliveryRequest deliveryRequest);
+    void shippedProductsToWarehouse(ShippedToDeliveryRequest deliveryRequest);
 }

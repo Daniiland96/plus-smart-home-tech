@@ -42,20 +42,20 @@ public class WarehouseController implements WarehouseApi {
     }
 
     @Override
-    public BookedProductsDto assemblingProductsForTheOrder(AssemblyProductsForOrderRequest assemblyRequest) {
+    public BookedProductsDto assemblingProductsForOrder(AssemblyProductsForOrderRequest assemblyRequest) {
         log.info("DTO на сборку продуктов для заказа: {}", assemblyRequest);
-        return warehouseService.assemblingProductsForTheOrder(assemblyRequest);
+        return warehouseService.assemblingProductsForOrder(assemblyRequest);
     }
 
     @Override
-    public void returnProductsToTheWarehouse(Map<UUID, Integer> returnedProducts) {
+    public void returnProductsToWarehouse(Map<UUID, Integer> returnedProducts) {
         log.info("Запрос на возврат товаров: {}", returnedProducts);
-        warehouseService.returnProductsToTheWarehouse(returnedProducts);
+        warehouseService.returnProductsToWarehouse(returnedProducts);
     }
 
     @Override
-    public void shippedProductsToTheWarehouse(ShippedToDeliveryRequest deliveryRequest) {
+    public void shippedProductsToWarehouse(ShippedToDeliveryRequest deliveryRequest) {
         log.info("Запрос на передачу заказа в доставку: {}", deliveryRequest);
-        warehouseService.shippedProductsToTheWarehouse(deliveryRequest);
+        warehouseService.shippedProductsToWarehouse(deliveryRequest);
     }
 }

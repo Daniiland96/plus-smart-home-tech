@@ -26,11 +26,11 @@ public interface WarehouseApi {
     AddressDto getAddressWarehouse();
 
     @PostMapping("/api/v1/warehouse/assembly")
-    BookedProductsDto assemblingProductsForTheOrder(@Valid @RequestBody AssemblyProductsForOrderRequest assemblyRequest);
+    BookedProductsDto assemblingProductsForOrder(@Valid @RequestBody AssemblyProductsForOrderRequest assemblyRequest);
 
     @PostMapping("/api/v1/warehouse/return")
-    void returnProductsToTheWarehouse(@RequestBody Map<UUID, Integer> returnedProducts);
+    void returnProductsToWarehouse(@RequestBody Map<UUID, Integer> returnedProducts);
 
     @PostMapping("/api/v1/warehouse/shipped")
-    void shippedProductsToTheWarehouse(@Valid @RequestBody ShippedToDeliveryRequest deliveryRequest);
+    void shippedProductsToWarehouse(@Valid @RequestBody ShippedToDeliveryRequest deliveryRequest);
 }
