@@ -16,10 +16,19 @@ public class ErrorHandler {
             IllegalArgumentException.class,
             SpecifiedProductAlreadyInWarehouseException.class,
             ProductInShoppingCartLowQuantityInWarehouse.class,
+            ProductInShoppingCartNotInWarehouse.class,
             NoSpecifiedProductInWarehouseException.class,
             MethodArgumentNotValidException.class
     })
     public ErrorResponse handleIBadRequestException(final Exception e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({
+            NoOrderFoundException.class
+    })
+    public ErrorResponse handleINotFoundException(final Exception e) {
         return new ErrorResponse(e.getMessage());
     }
 
